@@ -1,0 +1,5 @@
+# 폴더
+node_modules
+
+# 모든 html 파일
+*.html
