@@ -93,28 +93,30 @@
 			
 			var str="";
 			
-			str += "<div>"+i+"</div>";
+			/*str += "<div>"+i+"</div>";*/
 			var day = (i<10) ? "0"+i : i;            	
 			str += "<div id='"+day+"'></div>"; //나중에 원하는 날에 일정을 넣기위해 id값을 날짜로 설정
-			cell.innerHTML = str;
+			str += "<div style='text-align: right; font-size: 14px; margin-right: 5px;'>"+i+"</div>";
+
+            cell.innerHTML = str;
 			
 			cnt = cnt + 1;
 			if (cnt % 7 == 6) {//토요일
 				var str="";
-				str += "<div>"+i+"</div>";
+				//str += "<div>"+i+"</div>";
 				var day = (i<10) ? "0"+i : i;            	
-				str += "<div id='"+day+"'>";
-				str += "</div>";
+				str += str += "<div style='text-align: right; font-size: 14px; margin-right: 5px;'>"+i+"</div>";
+				str += "<div id='"+day+"'></div>";
 				cell.innerHTML = str;
 				cell.style.color = "#009de0"; //파란색
 				cell.style.backgroundColor = "#f7f7f7"; //토요일배경 회색                   
 			}
 			if (cnt % 7 == 0) { //일요일
 				var str="";
-				str += "<div>"+i+"</div>";
-				var day = (i<10) ? "0"+i : i;            	
-				str += "<div id='"+day+"'>";
-				str += "</div>";
+				//str += "<div>"+i+"</div>";
+				var day = (i<10) ? "0"+i : i;
+                str += str += "<div style='text-align: right; font-size: 14px; margin-right: 5px;'>"+i+"</div>";
+				str += "<div id='"+day+"'></div>";
 				cell.innerHTML = str;
 				row = calendar.insertRow();// 줄 추가
 				cell.style.color = "#ed5353"; //빨간색
@@ -245,14 +247,15 @@
 			<a href="javascript:thisMonth()">오늘</a>
 			</td>
 		</tr>
+        
 		<tr>
-			<td width="14%"> 월 </td>
-			<td width="14%"> 화 </td>
-			<td width="14%"> 수 </td>
-			<td width="14%"> 목 </td>
-			<td width="14%"> 금 </td>
-			<td width="14%"><font color="#009de0">토</font></td>
-			<td width="14%"><font color="#ed5353">일</font></td>
+			<td width="14%" style="text-align: right;">월</td>
+			<td width="14%" style="text-align: right;"> 화 </td>
+			<td width="14%" style="text-align: right;"> 수 </td>
+			<td width="14%" style="text-align: right;"> 목 </td>
+			<td width="14%" style="text-align: right;"> 금 </td>
+			<td width="14%" style="text-align: right;"><font color="#009de0">토</font></td>
+			<td width="14%" style="text-align: right;"><font color="#ed5353">일</font></td>
 		</tr>
 	</table>
 </body>
