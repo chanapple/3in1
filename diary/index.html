@@ -169,6 +169,12 @@
 
 </script>
 <body onload="autoReload();">
+	<button id="drawButton">그리기</button>
+	<div>
+        <label for="slider">PX</label>
+        <input type="range" min="1" max="10" value="10" id="slider" onchange="lineWidthReSizeForSlider()">
+    </div>
+	
 	<canvas id="myCanvas"  style="position: absolute; z-index: 1;"></canvas>
 
 	<script>
@@ -177,6 +183,7 @@
         var isDrawing = false;
         var lastX = 0;
         var lastY = 0;
+		let lineWidth = 10;
 
         context.canvas.width  = window.innerWidth;
         context.canvas.height = window.innerHeight;
@@ -185,6 +192,23 @@
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseout', stopDrawing);
+
+		document.getElementById('drawButton').addEventListener('click', toggleDrawing);
+
+		function toggleDrawing() {
+			isDrawing = !isDrawing;
+			if (isDrawing) {
+				document.getElementById('drawButton').textContent = 'stop';
+			} else {
+				document.getElementById('drawButton').textContent = '그리기';
+			}
+		}
+
+		function lineWidthReSizeForSlider() {
+			let sliderValue = document.getElementById('slider')
+			lineWidth = sliderValue.value;
+			document.getElementById('lineWidth').innerText = String(lineWidth);
+		}
 
         function startDrawing(event) {
             isDrawing = true;
@@ -196,6 +220,7 @@
             context.beginPath();
             context.moveTo(lastX, lastY);
             context.lineTo(event.offsetX, event.offsetY);
+			context.lineWidth = lineWidth; 
             context.stroke();
             [lastX, lastY] = [event.offsetX, event.offsetY];
         }
