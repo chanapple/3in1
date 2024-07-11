@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
+<head>  
+	<meta charset='utf-8' />  <!-- 화면 해상도에 따라 글자 크기 대응(모바일 대응) -->  
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">  
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js"></script>
 <style>
 	table {
 		width: 100%;
@@ -10,9 +14,8 @@
 	  width: 100%;
 	  height: 700px;
 	}
-
 </style>
-    
+</head>
 
 <script language="javascript">
 	var today = new Date(); //오늘 날짜 : Thu Jul 11 2024 20:02:36
@@ -235,27 +238,22 @@
 	<table align="center" id="calendar">
 		<tr>
 			<td>
-			<a id="before" href="javascript:beforem()"></a>
+				<a id="before" href="javascript:beforem()"></a>
 			</td>
 			<td colspan="4" align="center">
-			<div id="yearmonth"></div>
-			</td>
-			<td>
-			<a id="next" href="javascript:nextm()"></a>
-			</td>
-			<td>
-			<a href="javascript:thisMonth()">오늘</a>
-			</td>
+				<div id="yearmonth"></div></td>
+			<td><a id="next" href="javascript:nextm()"></a></td>
+			<td><a href="javascript:thisMonth()">오늘</a></td>
 		</tr>
         
 		<tr>
-			<td width="14%" style="text-align: right;">월</td>
-			<td width="14%" style="text-align: right;"> 화 </td>
-			<td width="14%" style="text-align: right;"> 수 </td>
-			<td width="14%" style="text-align: right;"> 목 </td>
-			<td width="14%" style="text-align: right;"> 금 </td>
-			<td width="14%" style="text-align: right;"><font color="#009de0">토</font></td>
-			<td width="14%" style="text-align: right;"><font color="#ed5353">일</font></td>
+			<td width="14%" style="text-align: center;">Mon</td>
+			<td width="14%" style="text-align: center;">Tue</td>
+			<td width="14%" style="text-align: center;">Wed</td>
+			<td width="14%" style="text-align: center;">Thu</td>
+			<td width="14%" style="text-align: center;">Fri</td>
+			<td width="14%" style="text-align: center;"><font color="#009de0">Sat</font></td>
+			<td width="14%" style="text-align: center;"><font color="#ed5353">Sun</font></td>
 		</tr>
 	</table>
 </body>
