@@ -22,41 +22,74 @@
 		/>
 	</head>
 	<body>
-		<!-- canvas 크기와 테두리 스타일 -->
-		<!-- ??왜 바탕색 입히면 도형이 아래로 깔리지..? -->
-		<canvas
-			id="canvas"
-			width="500px"
-			height="500px"
-			style="
-				border-radius: 15px;
-				box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11),
-					0 1px 3px rgba(0, 0, 0, 0.068);
-			"
-		></canvas>
+		<div>
+			<!-- 펜 색상 버튼 -->
+			<button id="black">BLACK</button>
+			<button id="red">RED</button>
+			<button id="blue">BLUE</button>
+			<button id="erase">ERASE</button>
+
+			<!-- canvas 크기와 테두리 스타일 -->
+			<canvas
+				id="canvas"
+				width="500px"
+				height="500px"
+				style="
+					border-radius: 15px;
+					box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11),
+						0 1px 3px rgba(0, 0, 0, 0.068);
+				"
+			></canvas>
+		</div>
+
 		<script>
-			// create a wrapper around native canvas element (with id="c")
-			//id=canvas를 이용해서 canvas 만듦
-			var canvas = new fabric.Canvas("canvas", {
-				// isDrawingMode: true, // 그리기 모드 활성화
-				backgroundColor: "white" // 캔버스 배경색을 흰색으로 설정
+			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행합니다.
+			document.addEventListener("DOMContentLoaded", function () {
+				//id=canvas를 이용해서 canvas 만듦
+				const canvas = new fabric.Canvas("canvas", {
+					isDrawingMode: true, // 그리기 모드 활성화
+					backgroundColor: "white" // 캔버스 배경색을 흰색으로 설정
+				});
+
+				// freeDrawingBrush가 undefined라서 PencilBrush를 수동으로 설정함.
+				canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+
+				// 기본 그리기 브러시 너비와 색상 설정
+				var brush_size = 5;
+				canvas.freeDrawingBrush.width = brush_size;
+				canvas.freeDrawingBrush.color = "black";
+
+				// 색상 변경
+				// "검정" 버튼 클릭에 대한 이벤트 리스너
+				document.getElementById("black").addEventListener("click", () => {
+					// 그리기 브러시 너비와 색상을 검정으로 변경
+					canvas.freeDrawingBrush.width = brush_size;
+					canvas.freeDrawingBrush.color = "black";
+				});
+
+				// "빨강" 버튼 클릭에 대한 이벤트 리스너
+				document.getElementById("red").addEventListener("click", () => {
+					// 그리기 브러시 너비와 색상을 빨강으로 변경
+					canvas.freeDrawingBrush.width = brush_size;
+					canvas.freeDrawingBrush.color = "red";
+					console.log(canvas.freeDrawingBrush.width);
+				});
+
+				// "파랑" 버튼 클릭에 대한 이벤트 리스너
+				document.getElementById("blue").addEventListener("click", () => {
+					// 그리기 브러시 너비와 색상을 파랑으로 변경
+					canvas.freeDrawingBrush.width = brush_size;
+					canvas.freeDrawingBrush.color = "blue";
+				});
+
+				// "지우개" 버튼 클릭에 대한 이벤트 리스너
+				document.getElementById("erase").addEventListener("click", () => {
+					// 그리기 브러시 너비를 크게 설정하여 지우개 효과를 시뮬레이트하고
+					// 색상을 캔버스 배경색으로 설정
+					canvas.freeDrawingBrush.width = 20;
+					canvas.freeDrawingBrush.color = canvas.backgroundColor;
+				});
 			});
-
-			// 기본 그리기 브러시 너비와 색상을 검정으로 설정합니다.
-			canvas.freeDrawingBrush.width = 5;
-			canvas.freeDrawingBrush.color = "black";
-
-			// create a rectangle object
-			var rect = new fabric.Rect({
-				left: 100,
-				top: 100,
-				fill: "red",
-				width: 20,
-				height: 20
-			});
-
-			// "add" rectangle onto canvas
-			canvas.add(rect);
 		</script>
 	</body>
 </html>
