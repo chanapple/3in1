@@ -5,8 +5,16 @@
 		width: 100%;
 		height: 700px;
 		}
+
+	canvas {
+	  border: 1px solid #000;
+	  width: 100%;
+	  height: 100%;
+	}
+
 </style>
     
+
 <script language="javascript">
 	var today = new Date(); //오늘 날짜        
 	var date = new Date();
@@ -162,6 +170,42 @@
 
 </script>
 <body onload="autoReload();">
+	<canvas id="myCanvas"  style="position: absolute; z-index: 1;"></canvas>
+
+	<script>
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        var isDrawing = false;
+        var lastX = 0;
+        var lastY = 0;
+
+        context.canvas.width  = window.innerWidth;
+        context.canvas.height = window.innerHeight;
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        function startDrawing(event) {
+            isDrawing = true;
+            [lastX, lastY] = [event.offsetX, event.offsetY];
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(event.offsetX, event.offsetY);
+            context.stroke();
+            [lastX, lastY] = [event.offsetX, event.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+    </script>
+
 	<table align="center" id="calendar">
 		<tr>
 			<td>
