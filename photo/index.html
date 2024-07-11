@@ -23,6 +23,15 @@
 	</head>
 	<body>
 		<div>
+			<!-- 브러시 크기 -->
+			브러시 크기<input
+				id="brush_size"
+				type="number"
+				min="0"
+				max="100"
+				value="5"
+			/>
+
 			<!-- 펜 색상 버튼 -->
 			<button id="black">BLACK</button>
 			<button id="red">RED</button>
@@ -43,7 +52,8 @@
 		</div>
 
 		<script>
-			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행합니다.
+			var brush_size = 5;
+			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
 				//id=canvas를 이용해서 canvas 만듦
 				const canvas = new fabric.Canvas("canvas", {
@@ -54,10 +64,18 @@
 				// freeDrawingBrush가 undefined라서 PencilBrush를 수동으로 설정함.
 				canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
 
-				// 기본 그리기 브러시 너비와 색상 설정
-				var brush_size = 5;
+				// 기본 그리기 브러시 너비와 색상을 검정으로 설정
 				canvas.freeDrawingBrush.width = brush_size;
 				canvas.freeDrawingBrush.color = "black";
+
+				//브러시 크기 변경.
+				document
+					.getElementById("brush_size")
+					.addEventListener("change", event => {
+						brush_size = parseInt(event.target.value, 10);
+						canvas.freeDrawingBrush.width = brush_size;
+						console.log(event.target.value);
+					});
 
 				// 색상 변경
 				// "검정" 버튼 클릭에 대한 이벤트 리스너
@@ -72,7 +90,6 @@
 					// 그리기 브러시 너비와 색상을 빨강으로 변경
 					canvas.freeDrawingBrush.width = brush_size;
 					canvas.freeDrawingBrush.color = "red";
-					console.log(canvas.freeDrawingBrush.width);
 				});
 
 				// "파랑" 버튼 클릭에 대한 이벤트 리스너
@@ -86,7 +103,7 @@
 				document.getElementById("erase").addEventListener("click", () => {
 					// 그리기 브러시 너비를 크게 설정하여 지우개 효과를 시뮬레이트하고
 					// 색상을 캔버스 배경색으로 설정
-					canvas.freeDrawingBrush.width = 20;
+					canvas.freeDrawingBrush.width = brush_size;
 					canvas.freeDrawingBrush.color = canvas.backgroundColor;
 				});
 			});
