@@ -18,6 +18,7 @@ router.use(
 	"/phaser",
 	express.static(path.join(__dirname, "/node_modules/phaser/dist"))
 );
+router.use("/js", express.static(path.join(__dirname, "/game/js")));
 /** 에셋 경로 지정 */
 router.use("/assets", express.static(path.join(__dirname, "/game/assets")));
 /** 모듈 내보내기 */
