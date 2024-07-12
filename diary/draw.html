@@ -28,28 +28,26 @@
         background-color: transparent;
         border: none;
     }
-    #parent {
-        display: flex;
-        flex-direction: row;
+ 
+    #drawButton {
+        border: 0px;
+        background-color: #fff;
     }
 
-    .tog-btn {
-        flex: 0 0 auto;
+    .dropdown {
+        border: 0px;
+        background-color: #fff;
     }
-
-    #eraseButton {
-        flex: 0 0 auto;
-    }
+   
     </style>
 </head>
 <body>
     <div>
-        <div id="parent">
-            <div class="tog-btn">
-                <button id="drawButton" style="display: inline-block;">그리기 모드</button>
-                <button id="stopDrawButton" style="display: none;">그리기 모드 정지</button>
-            </div>
-            <button id="eraseButton">지우기</button>
+        <div >
+            <button id="drawButton" style="display: inline-block;">그리기</button>
+            <button id="stopDrawButton" style="display: none;">그리기 정지</button>
+            <button id="eraseButton">지우기</button><br>
+            <button class="dropdown">내리기</button>    
         </div>
         
         <div class="toolbar" style="position: absolute; z-index: 2;">
@@ -67,18 +65,23 @@
             
             return function () {    
                 if (status) {      
-                    document.querySelector('.toolbar').classList.add('show');    
+                    document.querySelector('.toolbar').classList.add('show'); 
+                    const drop = document.querySelector('.dropdown');
+                    drop.innerText = '올리기';     
                 } else {      
-                    document.querySelector('.toolbar').classList.remove('show');   
+                    document.querySelector('.toolbar').classList.remove('show'); 
+                    const drop = document.querySelector('.dropdown');
+                    drop.innerText = '내리기';  
                 }    
                 status = !status;  
             }
         })(); 
         
-        document.querySelector('.tog-btn').addEventListener('click', toggleInit);
+        document.querySelector('.dropdown').addEventListener('click', toggleInit);
+
 	</script>
 
-	<canvas id="myCanvas"  style="position: absolute; z-index: 1;"></canvas>
+	<canvas id="myCanvas" style="position: absolute; z-index: 1;"></canvas>
 
 	<script>
         var canvas = document.getElementById('myCanvas');
