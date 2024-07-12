@@ -1,1 +1,203 @@
-photo
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<!-- jquery cdn -->
+		<script
+			src="https://code.jquery.com/jquery-3.7.1.min.js"
+			integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+			crossorigin="anonymous"
+		></script>
+		<!-- fabric cdn -->
+		<script src="https://cdn.jsdelivr.net/npm/fabric@6.0.2/dist/index.min.js"></script>
+		<!-- spectrum cdn -->
+		<script src="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.css"
+		/>
+
+		<link rel="stylesheet" href="/photo/css/main.css" />
+	</head>
+	<body>
+		<div>
+			<!-- 브러시 크기 -->
+			브러시 크기<input
+				id="brush_size"
+				type="number"
+				min="0"
+				max="100"
+				value="5"
+			/>
+
+			<!-- 팔레트 -->
+			<span>
+				<input id="color-picker" value="#00000" />
+			</span>
+
+			<!-- 미니팔레트\ > . < / -->
+			<button id="black" class="color_button"></button>
+			<button id="blue" class="color_button"></button>
+			<button id="red" class="color_button"></button>
+			<button id="green" class="color_button"></button>
+
+			<!-- 채우기/저장 버튼 -->
+			<div class="controls_btns">
+				<button id="photoMode" value="pen">Pen</button>
+				<button id="photoSave" onclick="document.execCommand('SaveAs')">
+					SAVE
+				</button>
+			</div>
+
+			<!-- 지우개 버튼 -->
+			<button id="erase">ERASE</button>
+			<!-- 캔버스 초기화 -->
+			<button id="clearCanvas">CLEAR</button>
+
+			<!-- canvas 크기와 테두리 스타일 -->
+			<canvas
+				id="canvas"
+				width="500px"
+				height="500px"
+				style="
+					border-radius: 15px;
+					box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11),
+						0 1px 3px rgba(0, 0, 0, 0.068);
+				"
+			></canvas>
+		</div>
+
+		<script>
+			// 함수
+			//미니 팔레트 함수 정의
+			function setupColorButtonListener(buttonId, canvas) {
+				//미니 팔레트 버튼 클릭 시 brush_color 변경.
+				document.getElementById(buttonId).addEventListener("click", () => {
+					var brush_color = buttonId;
+					canvas.freeDrawingBrush.color = brush_color;
+					document.getElementById("color-picker").value = buttonId;
+					colorPickerBackgroundColor(brush_color); //클릭한 버튼의 색상으로 팔레트 색상 변경.
+				});
+			}
+			//인자 값으로 팔레트 색상 변경하는 함수.
+			function colorPickerBackgroundColor(brush_color) {
+				document.querySelectorAll(".sp-colorize").forEach(div => {
+					div.style.backgroundColor = brush_color;
+				});
+			}
+			// 모든 .color_button 클래스 버튼에 대해 id=backgroundColor로 설정함.(css 통일 위해 사용)
+			document.querySelectorAll(".color_button").forEach(button => {
+				button.style.backgroundColor = button.id;
+				button.value = button.id;
+			});
+
+			//저장 함수 정의
+			function handleSaveClick() {
+				const image = canvas.toDataURL("image/png");
+				const link = document.createElement("a");
+				link.href = image;
+				link.download = "PaintJS[EXPORT]";
+				link.click();
+			}
+
+			//변수
+			//초기화 제어 변수
+			let clearControl = false;
+			let drawingControl = true;
+			//처음 캔버스 색상
+			let canvasBackgroundColor = "white";
+			let brush_color;
+			let brush_size;
+
+			//캔버스
+			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
+			document.addEventListener("DOMContentLoaded", function () {
+				//id=canvas를 이용해서 canvas 만듦
+				let canvas = new fabric.Canvas("canvas", {
+					isDrawingMode: drawingControl, // 그리기 모드 활성화
+					backgroundColor: canvasBackgroundColor // 캔버스 배경색을 흰색으로 설정
+				});
+
+				// freeDrawingBrush가 undefined라서 PencilBrush를 수동으로 설정함.
+				canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+
+				// 기본 그리기 브러시 너비와 색상 설정.
+				canvas.freeDrawingBrush.width = 5;
+				canvas.freeDrawingBrush.color = "black";
+
+				//브러시 크기 변경.
+				document
+					.getElementById("brush_size")
+					.addEventListener("change", event => {
+						brush_size = parseInt(event.target.value, 10);
+						canvas.freeDrawingBrush.width = brush_size;
+						console.log(brush_size);
+					});
+
+				// 팔레트 설정
+				$("#color-picker").spectrum({
+					type: "component",
+					showPalette: false,
+					showPaletteOnly: true,
+					togglePaletteOnly: true,
+					showInput: true,
+					showInitial: true
+				});
+
+				//팔레트 색상 변경 시 브러시 색상 동일하게 변경.
+				$("#color-picker").on("move.spectrum", function (e, tinycolor) {
+					brush_color = "#" + tinycolor.toHex();
+					canvas.freeDrawingBrush.color = brush_color;
+				});
+
+				// 미니 팔레트 클릭에 대한 이벤트 리스너
+				setupColorButtonListener("black", canvas);
+				setupColorButtonListener("blue", canvas);
+				setupColorButtonListener("red", canvas);
+				setupColorButtonListener("green", canvas);
+
+				document
+					.getElementById("photoMode")
+					.addEventListener("click", event => {
+						if (event.target.value == "pen") {
+							drawingControl = fale;
+						}
+					});
+
+				// "저장" 버튼 클릭에 대한 이벤트 리스너
+				const saveBtn = document.getElementById("photoSave");
+				if (saveBtn) {
+					saveBtn.addEventListener("click", handleSaveClick);
+				}
+
+				// "지우개" 버튼 클릭에 대한 이벤트 리스너
+				document.getElementById("erase").addEventListener("click", () => {
+					canvas.freeDrawingBrush.color = canvasBackgroundColor; // 색상을 캔버스 배경색으로 설정
+				});
+
+				//캔버스 초기화
+				document.getElementById("clearCanvas").addEventListener("click", () => {
+					canvas.clear(); // 캔버스 초기화
+					canvas.backgroundColor = canvasBackgroundColor; // 배경색 다시 설정
+					canvas.renderAll(); // 캔버스 다시 렌더링
+
+					// freeDrawingBrush 수동 설정.
+					canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+
+					//brush_color 재설정.
+					canvas.freeDrawingBrush.color =
+						document.getElementById("color-picker").value;
+
+					//brush_size 재설정.
+					canvas.freeDrawingBrush.width = parseInt(
+						document.getElementById("brush_size").value,
+						10
+					);
+				});
+			});
+		</script>
+	</body>
+</html>
