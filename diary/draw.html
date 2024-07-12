@@ -28,24 +28,39 @@
         background-color: transparent;
         border: none;
     }
+    #parent {
+        display: flex;
+        flex-direction: row;
+    }
 
+    .tog-btn {
+        flex: 0 0 auto;
+    }
+
+    #eraseButton {
+        flex: 0 0 auto;
+    }
     </style>
 </head>
 <body>
     <div>
-        <div class="tog-btn">
-            <button id="drawButton" style="display: inline-block;">그리기</button>
-            <button id="stopDrawButton" style="display: none;">그리기 정지</button>
+        <div id="parent">
+            <div class="tog-btn">
+                <button id="drawButton" style="display: inline-block;">그리기 모드</button>
+                <button id="stopDrawButton" style="display: none;">그리기 모드 정지</button>
+            </div>
+            <button id="eraseButton">지우기</button>
         </div>
-
-        <div class="toolbar">
+        
+        <div class="toolbar" style="position: absolute; z-index: 2;">
             <input id="color" type="color">
             <br>
             <label for="slider">PX</label>
             <input type="range" min="1" max="50" value="10" id="slider" onchange="lineWidthReSizeForSlider()">
         </div>
     </div>
-    
+
+    <!-- 툴바 -->
     <script>
         let toggleInit = (function () {  
             let status = true;   
@@ -78,12 +93,14 @@
 
         const color = document.getElementById("color");
 
+        // 굵기 기능
 		function lineWidthReSizeForSlider() {
 			let sliderValue = document.getElementById('slider')
 			lineWidth = sliderValue.value;
 			document.getElementById('lineWidth').innerText = String(lineWidth);
 		}
 
+        // 그리기 기본 기능
         function startDrawing(event) {
             isDrawing = true;
             [lastX, lastY] = [event.offsetX, event.offsetY];
@@ -103,6 +120,7 @@
             isDrawing = false;
         }
 
+        // 그리기, 그리기 정지 버튼
         document.getElementById('drawButton').addEventListener('click', function() {
             this.style.display = 'none';
             document.getElementById('stopDrawButton').style.display = 'inline-block';
@@ -120,11 +138,22 @@
             isDrawing = false;
         });
 
+        const eraserBtn = document.getElementById("eraseButton");
+
+        // 지우개 기능
+        function onEraserClick() {
+            context.strokeStyle = "white";
+        }
+
+        eraserBtn.addEventListener("click", onEraserClick);
+
+        // 색 변경 기능
         function oncolorChange(event) {
             context.strokeStyle = event.target.value;
         }
 
         color.addEventListener("change", oncolorChange);
+
     </script>
 </body>
 </html>
