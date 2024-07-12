@@ -38,42 +38,10 @@
 				<input id="color-picker" value="#00000" />
 			</span>
 			<!-- 미니팔레트\ > . < / -->
-			<button
-				id="black"
-				style="
-					background-color: black;
-					width: 30px;
-					height: 30px;
-					border: solid 1px;
-				"
-			></button>
-			<button
-				id="blue"
-				style="
-					background-color: blue;
-					width: 30px;
-					height: 30px;
-					border: solid 1px;
-				"
-			></button>
-			<button
-				id="red"
-				style="
-					background-color: red;
-					width: 30px;
-					height: 30px;
-					border: solid 1px;
-				"
-			></button>
-			<button
-				id="green"
-				style="
-					background-color: green;
-					width: 30px;
-					height: 30px;
-					border: solid 1px;
-				"
-			></button>
+			<button id="black" class="color_button"></button>
+			<button id="blue" class="color_button"></button>
+			<button id="red" class="color_button"></button>
+			<button id="green" class="color_button"></button>
 
 			<!-- 채우기/저장 버튼 -->
 			<div class="controls_btns">
@@ -102,19 +70,38 @@
 		</div>
 
 		<script>
+			// 함수
 			//미니 팔레트 함수 정의
 			function setupColorButtonListener(buttonId, canvas) {
+				//미니 팔레트 버튼 클릭 시 brush_color 변경.
 				document.getElementById(buttonId).addEventListener("click", () => {
 					var brush_color = buttonId;
 					canvas.freeDrawingBrush.color = brush_color;
+					document.getElementById("color-picker").value = buttonId;
+					colorPickerBackgroundColor(brush_color); //클릭한 버튼의 색상으로 팔레트 색상 변경.
 				});
 			}
+			//인자 값으로 팔레트 색상 변경하는 함수.
+			function colorPickerBackgroundColor(brush_color) {
+				document.querySelectorAll(".sp-colorize").forEach(div => {
+					div.style.backgroundColor = brush_color;
+				});
+			}
+			// 모든 .color_button 클래스 버튼에 대해 id=backgroundColor로 설정함.(css 통일 위해 사용)
+			document.querySelectorAll(".color_button").forEach(button => {
+				button.style.backgroundColor = button.id;
+				button.value = button.id;
+			});
 
-			//초기화 제어 변수
-			let clearControl = false;
+			//변수
+			//마우스모드 제어 변수
 			let drawingControl = true;
+			//처음 캔버스 색상
 			let canvasBackgroundColor = "white";
+			let brush_color;
+			let brush_size;
 
+			//캔버스
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
 				//id=canvas를 이용해서 canvas 만듦
@@ -134,7 +121,7 @@
 				document
 					.getElementById("brush_size")
 					.addEventListener("change", event => {
-						let brush_size = parseInt(event.target.value, 10);
+						brush_size = parseInt(event.target.value, 10);
 						canvas.freeDrawingBrush.width = brush_size;
 						console.log(brush_size);
 					});
@@ -151,7 +138,7 @@
 
 				//팔레트 색상 변경 시 브러시 색상 동일하게 변경.
 				$("#color-picker").on("move.spectrum", function (e, tinycolor) {
-					let brush_color = "#" + tinycolor.toHex();
+					brush_color = "#" + tinycolor.toHex();
 					canvas.freeDrawingBrush.color = brush_color;
 				});
 
