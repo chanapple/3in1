@@ -19,6 +19,7 @@
 			type="text/css"
 			href="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.css"
 		/>
+
 		<link rel="stylesheet" href="/photo/css/main.css" />
 	</head>
 	<body>
@@ -36,6 +37,43 @@
 			<span>
 				<input id="color-picker" value="#00000" />
 			</span>
+			<!-- 미니팔레트\ > . < / -->
+			<button
+				id="black"
+				style="
+					background-color: black;
+					width: 30px;
+					height: 30px;
+					border: solid 1px;
+				"
+			></button>
+			<button
+				id="blue"
+				style="
+					background-color: blue;
+					width: 30px;
+					height: 30px;
+					border: solid 1px;
+				"
+			></button>
+			<button
+				id="red"
+				style="
+					background-color: red;
+					width: 30px;
+					height: 30px;
+					border: solid 1px;
+				"
+			></button>
+			<button
+				id="green"
+				style="
+					background-color: green;
+					width: 30px;
+					height: 30px;
+					border: solid 1px;
+				"
+			></button>
 
 			<!-- 채우기/저장 버튼 -->
 			<div class="controls_btns">
@@ -64,6 +102,14 @@
 		</div>
 
 		<script>
+			//미니 팔레트 함수 정의
+			function setupColorButtonListener(buttonId, canvas) {
+				document.getElementById(buttonId).addEventListener("click", () => {
+					var brush_color = buttonId;
+					canvas.freeDrawingBrush.color = brush_color;
+				});
+			}
+
 			//초기화 제어 변수
 			var clearBool = false;
 
@@ -100,6 +146,7 @@
 					showInput: true,
 					showInitial: true
 				});
+
 				//팔레트 색상 변경 시 브러시 색상 동일하게 변경.
 				$("#color-picker").on("move.spectrum", function (e, tinycolor) {
 					var brush_color = tinycolor.toHex();
@@ -107,6 +154,12 @@
 					console.log(brush_color);
 					console.log(canvas.freeDrawingBrush.color);
 				});
+
+				// 미니 팔레트 클릭에 대한 이벤트 리스너
+				setupColorButtonListener("black", canvas);
+				setupColorButtonListener("blue", canvas);
+				setupColorButtonListener("red", canvas);
+				setupColorButtonListener("green", canvas);
 
 				// "지우개" 버튼 클릭에 대한 이벤트 리스너
 				document.getElementById("erase").addEventListener("click", () => {
