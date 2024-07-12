@@ -4,16 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>      
+    .toolbar { 
+        display: none; 
+        position: relative; 
+        width: 200px; 
+        padding: 15px; 
+        background: #fbf5f1; 
+        text-align: center; 
+        -webkit-box-shadow: 0 10px 21px -2px rgba(50,51,42,0.2); 
+        box-shadow: 0 10px 21px -2px rgba(50,51,42,0.2); 
+    }    
+    .toolbar.show { 
+        display: block; 
+    }    
+
+    #color {
+        width: 130px;
+        height: 80px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: transparent;
+        border: none;
+    }
+
+    </style>
 </head>
 <body>
-    <button id="drawButton" style="display: inline-block;">그리기</button>
-    <button id="stopDrawButton" style="display: none;">그리기 정지</button>
+    <div>
+        <div class="tog-btn">
+            <button id="drawButton" style="display: inline-block;">그리기</button>
+            <button id="stopDrawButton" style="display: none;">그리기 정지</button>
+        </div>
 
-	<div>
-        <label for="slider">PX</label>
-        <input type="range" min="1" max="10" value="10" id="slider" onchange="lineWidthReSizeForSlider()">
+        <div class="toolbar">
+            <input id="color" type="color">
+            <br>
+            <label for="slider">PX</label>
+            <input type="range" min="1" max="50" value="10" id="slider" onchange="lineWidthReSizeForSlider()">
+        </div>
     </div>
-	
+    
+    <script>
+        let toggleInit = (function () {  
+            let status = true;   
+            
+            return function () {    
+                if (status) {      
+                    document.querySelector('.toolbar').classList.add('show');    
+                } else {      
+                    document.querySelector('.toolbar').classList.remove('show');   
+                }    
+                status = !status;  
+            }
+        })(); 
+        
+        document.querySelector('.tog-btn').addEventListener('click', toggleInit);
+	</script>
+
 	<canvas id="myCanvas"  style="position: absolute; z-index: 1;"></canvas>
 
 	<script>
@@ -27,6 +76,7 @@
         context.canvas.width  = window.innerWidth;
         context.canvas.height = window.innerHeight;
 
+        const color = document.getElementById("color");
 
 		function lineWidthReSizeForSlider() {
 			let sliderValue = document.getElementById('slider')
@@ -69,6 +119,12 @@
             canvas.removeEventListener('mouseup', stopDrawing);
             isDrawing = false;
         });
+
+        function oncolorChange(event) {
+            context.strokeStyle = event.target.value;
+        }
+
+        color.addEventListener("change", oncolorChange);
     </script>
 </body>
 </html>
