@@ -47,6 +47,8 @@
 
 			<!-- 지우개 버튼 -->
 			<button id="erase">ERASE</button>
+			<!-- 캔버스 초기화 -->
+			<button id="clearCanvas">CLEAR</button>
 
 			<!-- canvas 크기와 테두리 스타일 -->
 			<canvas
@@ -103,12 +105,17 @@
 					console.log(canvas.freeDrawingBrush.color);
 				});
 
-				// // "지우개" 버튼 클릭에 대한 이벤트 리스너
+				// "지우개" 버튼 클릭에 대한 이벤트 리스너
 				document.getElementById("erase").addEventListener("click", () => {
-					// 그리기 브러시 너비를 크게 설정하여 지우개 효과를 시뮬레이트하고
-					// 색상을 캔버스 배경색으로 설정
-					canvas.freeDrawingBrush.width = brush_size;
-					canvas.freeDrawingBrush.color = canvas.backgroundColor;
+					canvas.freeDrawingBrush.width = brush_size; // 그리기 브러시 너비를 크게 설정
+					canvas.freeDrawingBrush.color = canvas.backgroundColor; // 색상을 캔버스 배경색으로 설정
+				});
+
+				//캔버스 초기화
+				document.getElementById("clearCanvas").addEventListener("click", () => {
+					canvas.clear(); // 캔버스 초기화
+					canvas.backgroundColor = canvas.backgroundColor; // 캔버스 배경색으로 덮기.
+					canvas.renderAll(); // 캔버스 다시 렌더링
 				});
 			});
 		</script>
