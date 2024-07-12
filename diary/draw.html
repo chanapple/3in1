@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>      
+    .toolbar { 
+        display: none; 
+        position: relative; 
+        width: 200px; 
+        padding: 15px; 
+        background: #fbf5f1; 
+        text-align: center; 
+        -webkit-box-shadow: 0 10px 21px -2px rgba(50,51,42,0.2); 
+        box-shadow: 0 10px 21px -2px rgba(50,51,42,0.2); 
+    }    
+    .toolbar.show { 
+        display: block; 
+    }    
+
+    #color {
+        width: 130px;
+        height: 80px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: transparent;
+        border: none;
+    }
+ 
+    #drawButton {
+        border: 0px;
+        background-color: #fff;
+    }
+
+    .dropdown {
+        border: 0px;
+        background-color: #fff;
+    }
+   
+    </style>
+</head>
+<body>
+    <div>
+        <div >
+            <button id="drawButton" style="display: inline-block;">그리기</button>
+            <button id="stopDrawButton" style="display: none;">그리기 정지</button>
+            <button id="eraseButton">지우기</button><br>
+            <button class="dropdown">내리기</button>    
+        </div>
+        
+        <div class="toolbar" style="position: absolute; z-index: 2;">
+            <input id="color" type="color">
+            <br>
+            <label for="slider">PX</label>
+            <input type="range" min="1" max="50" value="10" id="slider" onchange="lineWidthReSizeForSlider()">
+        </div>
+    </div>
+
+    <!-- 툴바 -->
+    <script>
+        let toggleInit = (function () {  
+            let status = true;   
+            
+            return function () {    
+                if (status) {      
+                    document.querySelector('.toolbar').classList.add('show'); 
+                    const drop = document.querySelector('.dropdown');
+                    drop.innerText = '올리기';     
+                } else {      
+                    document.querySelector('.toolbar').classList.remove('show'); 
+                    const drop = document.querySelector('.dropdown');
+                    drop.innerText = '내리기';  
+                }    
+                status = !status;  
+            }
+        })(); 
+        
+        document.querySelector('.dropdown').addEventListener('click', toggleInit);
+
+	</script>
+
+	<canvas id="myCanvas" style="position: absolute; z-index: 1;"></canvas>
+
+	<script>
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        var isDrawing = false;
+        var lastX = 0;
+        var lastY = 0;
+		let lineWidth = 10;
+
+        context.canvas.width  = window.innerWidth;
+        context.canvas.height = window.innerHeight;
+
+        const color = document.getElementById("color");
+
+        // 굵기 기능
+		function lineWidthReSizeForSlider() {
+			let sliderValue = document.getElementById('slider')
+			lineWidth = sliderValue.value;
+			document.getElementById('lineWidth').innerText = String(lineWidth);
+		}
+
+        // 그리기 기본 기능
+        function startDrawing(event) {
+            isDrawing = true;
+            [lastX, lastY] = [event.offsetX, event.offsetY];
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(event.offsetX, event.offsetY);
+			context.lineWidth = lineWidth; 
+            context.stroke();
+            [lastX, lastY] = [event.offsetX, event.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // 그리기, 그리기 정지 버튼
+        document.getElementById('drawButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('stopDrawButton').style.display = 'inline-block';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+        });
+
+        document.getElementById('stopDrawButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('drawButton').style.display = 'inline-block';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            isDrawing = false;
+        });
+
+        const eraserBtn = document.getElementById("eraseButton");
+
+        // 지우개 기능
+        function onEraserClick() {
+            context.strokeStyle = "white";
+        }
+
+        eraserBtn.addEventListener("click", onEraserClick);
+
+        // 색 변경 기능
+        function oncolorChange(event) {
+            context.strokeStyle = event.target.value;
+        }
+
+        color.addEventListener("change", oncolorChange);
+
+    </script>
+</body>
+</html>
