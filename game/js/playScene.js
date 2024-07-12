@@ -89,6 +89,9 @@ class play extends Scene {
 
 		this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
 		this.cameras.main.startFollow(this.player);
+		
+		// 마우스 컨텍스트 메뉴 비활성화
+        this.input.mouse.disableContextMenu();
 	}
 
 	update() {
