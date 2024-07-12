@@ -93,8 +93,17 @@
 				button.value = button.id;
 			});
 
-			//변수
-			//마우스모드 제어 변수
+			//저장 함수 정의
+			function handleSaveClick() {
+				const image = canvas.toDataURL("image/png");
+				const link = document.createElement("a");
+				link.href = image;
+				link.download = "PaintJS[EXPORT]";
+				link.click();
+			}
+
+			//초기화 제어 변수
+			let clearControl = false;
 			let drawingControl = true;
 			//처음 캔버스 색상
 			let canvasBackgroundColor = "white";
@@ -147,6 +156,12 @@
 				setupColorButtonListener("blue", canvas);
 				setupColorButtonListener("red", canvas);
 				setupColorButtonListener("green", canvas);
+
+				// "저장" 버튼 클릭에 대한 이벤트 리스너
+				const saveBtn = document.getElementById("photoSave");
+				if (saveBtn) {
+					saveBtn.addEventListener("click", handleSaveClick);
+				}
 
 				// "지우개" 버튼 클릭에 대한 이벤트 리스너
 				document.getElementById("erase").addEventListener("click", () => {
