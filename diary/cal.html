@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">  
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css' rel='stylesheet'>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/locales-all.min.js'></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar'); 
+            var calendar = new FullCalendar.Calendar(calendarEl, { //full-calendar 생성
+                height: '700px',
+                expandRows: true,
+                headerToolbar: {    // 달력 헤더
+                    left: 'prev,next',          
+                    center: 'title',          
+                    right: 'today'        
+                },
+                initialView: 'dayGridMonth', // 첫화면을 달력으로
+                editable: true, // 수정 가능
+                selectable: true, // 달력 일자 드래그 설정가능
+                displayEventTime: false, // 시간 표시 안함
+                fixedWeekCount: false, // 막주에 맞춰 칸 조정
+                dayMaxEvents: true, // 이벤트 오버 높이 제한 (+2)
+                eventAdd: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
+                    console.log(obj);
+                },
+                eventChange: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
+                    console.log(obj);
+                },
+                eventRemove: function(obj) { // 이벤트가 제거되면 발생하는 이벤트
+                    console.log(obj);
+                },
+                select: function(arg) { // 캘린더에서 드래그로 이벤트를 생성할 수 있다.
+                    var title = prompt('Event Title:');
+                    if (title) {
+                            calendar.addEvent({
+                                title: title,
+                                start: arg.start,
+                                end: arg.end,
+                                allDay: arg.allDay
+                            })
+                    }
+                calendar.unselect()
+            },
+                eventDidMount: function (info) {
+                    tippy(info.el, {
+                        content: info.event._def.title,
+                        placement: "bottom",
+                        offset: [0,0],
+                        interactive: true,
+                    })
+                },
+                events: [ // 일정 데이터 추가 , DB의 event를 가져오려면 JSON 형식으로 변환해 events에 넣어주면된다.
+                    {
+                        title:'MT',
+                        start:'2024-07-20 00:00:00',
+                        end:'2024-07-22 24:00:00'
+                    }
+                ],
+            });
+            calendar.render();
+        });
+    </script>
+<style>
+    html, body {
+        overflow: hidden; /*스크롤바 감춤*/
+        padding-left: 2em;
+        padding-right: 2em;
+        font-size: 14px;
+    }
+    .fc-header-toolbar {
+        padding-top: 2em;
+    }
+</style>
+</head>
+<body >
+    <div id="calendarBox">
+        <div id="calendar"></div>
+    </div>
+</body>
+</html>
