@@ -35,6 +35,14 @@
                 eventRemove: function(obj) { // 이벤트가 제거되면 발생하는 이벤트
                     console.log(obj);
                 },
+                eventDidMount: function(info) {
+                    tippy(info.el, {
+                        content: info.event._def.title,
+                        placement: "bottom",
+                        offset: [0,0],
+                        interactive: true,
+                    })
+                },
                 select: function(arg) { // 캘린더에서 드래그로 이벤트를 생성할 수 있다.
                     var title = prompt('Event Title:');
                     if (title) {
@@ -46,15 +54,8 @@
                             })
                     }
                 calendar.unselect()
-            },
-                eventDidMount: function (info) {
-                    tippy(info.el, {
-                        content: info.event._def.title,
-                        placement: "bottom",
-                        offset: [0,0],
-                        interactive: true,
-                    })
                 },
+                
                 events: [ // 일정 데이터 추가 , DB의 event를 가져오려면 JSON 형식으로 변환해 events에 넣어주면된다.
                     {
                         title:'MT',
