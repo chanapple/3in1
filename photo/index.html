@@ -64,6 +64,9 @@
 		</div>
 
 		<script>
+			//초기화 제어 변수
+			var clearBool = false;
+
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
 				//id=canvas를 이용해서 canvas 만듦
@@ -112,11 +115,17 @@
 				});
 
 				//캔버스 초기화
-				document.getElementById("clearCanvas").addEventListener("click", () => {
-					canvas.clear(); // 캔버스 초기화
-					canvas.backgroundColor = canvas.backgroundColor; // 캔버스 배경색으로 덮기.
-					canvas.renderAll(); // 캔버스 다시 렌더링
-				});
+				document.getElementById("clearCanvas").addEventListener(
+					"click",
+					() => {
+						canvas.clear(); // 캔버스 초기화
+						canvas.backgroundColor = canvas.backgroundColor; // 캔버스 배경색으로 덮기.
+						clearBool = true;
+						console.log(clearBool);
+						canvas.renderAll(); // 캔버스 다시 렌더링
+					},
+					{once: clearBool}
+				);
 			});
 		</script>
 	</body>
