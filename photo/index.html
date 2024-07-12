@@ -65,14 +65,16 @@
 
 		<script>
 			//초기화 제어 변수
-			var clearBool = false;
+			let clearControl = false;
+			let drawingControl = true;
+			let canvasBackgroundColor = "white";
 
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
 				//id=canvas를 이용해서 canvas 만듦
-				const canvas = new fabric.Canvas("canvas", {
-					isDrawingMode: true, // 그리기 모드 활성화
-					backgroundColor: "white" // 캔버스 배경색을 흰색으로 설정
+				let canvas = new fabric.Canvas("canvas", {
+					isDrawingMode: drawingControl, // 그리기 모드 활성화
+					backgroundColor: canvasBackgroundColor // 캔버스 배경색을 흰색으로 설정
 				});
 
 				// freeDrawingBrush가 undefined라서 PencilBrush를 수동으로 설정함.
@@ -86,7 +88,7 @@
 				document
 					.getElementById("brush_size")
 					.addEventListener("change", event => {
-						var brush_size = parseInt(event.target.value, 10);
+						let brush_size = parseInt(event.target.value, 10);
 						canvas.freeDrawingBrush.width = brush_size;
 						console.log(brush_size);
 					});
@@ -102,30 +104,34 @@
 				});
 				//팔레트 색상 변경 시 브러시 색상 동일하게 변경.
 				$("#color-picker").on("move.spectrum", function (e, tinycolor) {
-					var brush_color = tinycolor.toHex();
-					canvas.freeDrawingBrush.color = "#" + brush_color;
-					console.log(brush_color);
-					console.log(canvas.freeDrawingBrush.color);
+					let brush_color = "#" + tinycolor.toHex();
+					canvas.freeDrawingBrush.color = brush_color;
 				});
 
 				// "지우개" 버튼 클릭에 대한 이벤트 리스너
 				document.getElementById("erase").addEventListener("click", () => {
-					canvas.freeDrawingBrush.width = brush_size; // 그리기 브러시 너비를 크게 설정
-					canvas.freeDrawingBrush.color = canvas.backgroundColor; // 색상을 캔버스 배경색으로 설정
+					canvas.freeDrawingBrush.color = canvasBackgroundColor; // 색상을 캔버스 배경색으로 설정
 				});
 
 				//캔버스 초기화
-				document.getElementById("clearCanvas").addEventListener(
-					"click",
-					() => {
-						canvas.clear(); // 캔버스 초기화
-						canvas.backgroundColor = canvas.backgroundColor; // 캔버스 배경색으로 덮기.
-						clearBool = true;
-						console.log(clearBool);
-						canvas.renderAll(); // 캔버스 다시 렌더링
-					},
-					{once: clearBool}
-				);
+				document.getElementById("clearCanvas").addEventListener("click", () => {
+					canvas.clear(); // 캔버스 초기화
+					canvas.backgroundColor = canvasBackgroundColor; // 배경색 다시 설정
+					canvas.renderAll(); // 캔버스 다시 렌더링
+
+					// freeDrawingBrush 수동 설정.
+					canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+
+					//brush_color 재설정.
+					canvas.freeDrawingBrush.color =
+						document.getElementById("color-picker").value;
+
+					//brush_size 재설정.
+					canvas.freeDrawingBrush.width = parseInt(
+						document.getElementById("brush_size").value,
+						10
+					);
+				});
 			});
 		</script>
 	</body>
