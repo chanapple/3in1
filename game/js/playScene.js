@@ -46,7 +46,7 @@ class play extends Scene {
 	}
 
 	create() {
-		this.add.image(600, 400, "sky").setScale(2);
+		this.add.image(4000, 3200, "sky").setScale(11);
 
 		const groundBlock = this.physics.add.staticGroup();
 
@@ -56,7 +56,7 @@ class play extends Scene {
 		// 그룹의 물리 속성 갱신
 		groundBlock.refresh();
 
-		this.player = this.physics.add.sprite(100, 450, "dude");
+		this.player = this.physics.add.sprite(4000, 3168, "dude");
 		this.player.setBounce(0.2);
 
 		this.anims.create({
