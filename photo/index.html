@@ -37,6 +37,7 @@
 			<span>
 				<input id="color-picker" value="#00000" />
 			</span>
+
 			<!-- 미니팔레트\ > . < / -->
 			<button id="black" class="color_button"></button>
 			<button id="blue" class="color_button"></button>
@@ -45,7 +46,7 @@
 
 			<!-- 채우기/저장 버튼 -->
 			<div class="controls_btns">
-				<button id="photoMode">FILL</button>
+				<button id="photoMode" value="pen">Pen</button>
 				<button id="photoSave" onclick="document.execCommand('SaveAs')">
 					SAVE
 				</button>
@@ -102,6 +103,7 @@
 				link.click();
 			}
 
+			//변수
 			//초기화 제어 변수
 			let clearControl = false;
 			let drawingControl = true;
@@ -156,6 +158,14 @@
 				setupColorButtonListener("blue", canvas);
 				setupColorButtonListener("red", canvas);
 				setupColorButtonListener("green", canvas);
+
+				document
+					.getElementById("photoMode")
+					.addEventListener("click", event => {
+						if (event.target.value == "pen") {
+							drawingControl = fale;
+						}
+					});
 
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
