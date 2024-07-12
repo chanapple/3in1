@@ -26,7 +26,11 @@ class play extends Scene {
 		for (let x = 0; x <= mapWidth; x += step) {
 			groundBlock.create(x, groundHeight, "map", 0).setScale(2).setOrigin(0, 0);
 			for (let y = groundHeight + 32; y <= mapHeight; y += step) {
-				groundBlock.create(x, y, "map", 16).setScale(2).setOrigin(0, 0);
+				groundBlock
+					.create(x, y, "map", 16)
+					.setScale(2)
+					.setOrigin(0, 0)
+					.setInteractive();
 			}
 		}
 	}
@@ -36,9 +40,9 @@ class play extends Scene {
 		this.load.image("ground", "assets/platform.png");
 		this.load.image("star", "assets/star.png");
 		this.load.image("bomb", "assets/bomb.png");
-		this.load.spritesheet("dude", "assets/dude.png", {
-			frameWidth: 32,
-			frameHeight: 48
+		this.load.spritesheet("knight", "assets/sprites/adventurer.png", {
+			frameWidth: 50,
+			frameHeight: 37
 		});
 		this.load.spritesheet("map", "assets/sprites/world_tileset.png", {
 			frameWidth: 16,
@@ -57,27 +61,20 @@ class play extends Scene {
 		// 그룹의 물리 속성 갱신
 		groundBlock.refresh();
 
-		this.player = this.physics.add.sprite(4000, 3168, "dude");
+		this.player = this.physics.add.sprite(4000, 3168, "knight").setScale(2.5);
 		this.player.setBounce(0.2);
 
 		this.anims.create({
-			key: "left",
-			frames: this.anims.generateFrameNumbers("dude", {start: 0, end: 3}),
+			key: "walk",
+			frames: this.anims.generateFrameNumbers("knight", {start: 26, end: 31}),
 			frameRate: 10,
 			repeat: -1
 		});
 
 		this.anims.create({
 			key: "turn",
-			frames: [{key: "dude", frame: 4}],
+			frames: this.anims.generateFrameNumbers("knight", {start: 0, end: 3}),
 			frameRate: 20
-		});
-
-		this.anims.create({
-			key: "right",
-			frames: this.anims.generateFrameNumbers("dude", {start: 5, end: 8}),
-			frameRate: 10,
-			repeat: -1
 		});
 
 		this.scoreText = this.add.text(16, 16, "score: 0", {
@@ -89,16 +86,20 @@ class play extends Scene {
 
 		this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
 		this.cameras.main.startFollow(this.player);
+
+		groundBlock.on("pointerdown", function (params) {});
 	}
 
 	update() {
 		const cursors = this.input.keyboard.createCursorKeys();
 		if (cursors.left.isDown) {
+			this.player.setFlipX(true);
 			this.player.setVelocityX(-260);
-			this.player.anims.play("left", true);
+			this.player.anims.play("walk", true);
 		} else if (cursors.right.isDown) {
+			this.player.setFlipX(false);
 			this.player.setVelocityX(260);
-			this.player.anims.play("right", true);
+			this.player.anims.play("walk", true);
 		} else {
 			this.player.setVelocityX(0);
 			this.player.anims.play("turn");
