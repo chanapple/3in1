@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>draw</title>
+    <title>Document</title>
 </head>
 <body>
-    <button id="drawButton">그리기</button>
+    <button id="drawButton" style="display: inline-block;">그리기</button>
+    <button id="stopDrawButton" style="display: none;">그리기 정지</button>
+
 	<div>
         <label for="slider">PX</label>
         <input type="range" min="1" max="10" value="10" id="slider" onchange="lineWidthReSizeForSlider()">
@@ -25,21 +27,6 @@
         context.canvas.width  = window.innerWidth;
         context.canvas.height = window.innerHeight;
 
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-
-		document.getElementById('drawButton').addEventListener('click', toggleDrawing);
-
-		function toggleDrawing() {
-			isDrawing = !isDrawing;
-			if (isDrawing) {
-				document.getElementById('drawButton').textContent = 'stop';
-			} else {
-				document.getElementById('drawButton').textContent = '그리기';
-			}
-		}
 
 		function lineWidthReSizeForSlider() {
 			let sliderValue = document.getElementById('slider')
@@ -65,6 +52,23 @@
         function stopDrawing() {
             isDrawing = false;
         }
+
+        document.getElementById('drawButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('stopDrawButton').style.display = 'inline-block';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+        });
+
+        document.getElementById('stopDrawButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('drawButton').style.display = 'inline-block';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            isDrawing = false;
+        });
     </script>
 </body>
 </html>
