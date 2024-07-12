@@ -24,8 +24,9 @@ class play extends Scene {
 	mapBuilder(mapWidth, mapHeight, step, groundBlock) {
 		var groundHeight = mapHeight / 2;
 		for (let x = 0; x <= mapWidth; x += step) {
-			for (let y = groundHeight; y <= mapHeight; y += step) {
-				groundBlock.create(x, y, "map", 1).setScale(2).setOrigin(0, 0);
+			groundBlock.create(x, groundHeight, "map", 0).setScale(2).setOrigin(0, 0);
+			for (let y = groundHeight + 32; y <= mapHeight; y += step) {
+				groundBlock.create(x, y, "map", 16).setScale(2).setOrigin(0, 0);
 			}
 		}
 	}
