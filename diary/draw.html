@@ -29,7 +29,7 @@
         border: none;
     }
  
-    #drawButton {
+    #drawButton, #stopDrawButton {
         border: 0px;
         background-color: #fff;
     }
@@ -43,11 +43,21 @@
 </head>
 <body>
     <div>
-        <div >
-            <button id="drawButton" style="display: inline-block;">그리기</button>
-            <button id="stopDrawButton" style="display: none;">그리기 정지</button>
-            <button id="eraseButton">지우기</button><br>
-            <button class="dropdown">내리기</button>    
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; flex-direction: row; align-items: center;">
+                <button id="drawButton" style="display: inline-block; ">
+                    <img src="/diary/image/paint-brush-icon.png" width="30px" style="padding: 10px;">
+                </button>
+                <button id="stopDrawButton" style="display: none; ">
+                    <img src="/diary/image/paint-brush-icon.png" width="30px" style="background-color: rgb(228, 228, 228); padding: 10px;">
+                </button>
+                <button id="eraseButton" style="margin-right: 10px;">지우기</button>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; ">
+                <button class="dropdown" style="display: flex; flex-direction: row; align-items: center;">
+                    <img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 19px;">
+                </button>
+            </div>
         </div>
         
         <div class="toolbar" style="position: absolute; z-index: 2;">
@@ -67,11 +77,11 @@
                 if (status) {      
                     document.querySelector('.toolbar').classList.add('show'); 
                     const drop = document.querySelector('.dropdown');
-                    drop.innerText = '올리기';     
+                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="transform: rotate(180deg); margin-left: 19px;">';     
                 } else {      
                     document.querySelector('.toolbar').classList.remove('show'); 
                     const drop = document.querySelector('.dropdown');
-                    drop.innerText = '내리기';  
+                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 19px;">';  
                 }    
                 status = !status;  
             }
@@ -123,15 +133,28 @@
             isDrawing = false;
         }
 
-        // 그리기, 그리기 정지 버튼
+
+        // 지우개 버튼 클릭 시
+        document.getElementById('eraseButton').addEventListener('click', function() {
+            context.strokeStyle = "white"; 
+            document.getElementById('stopDrawButton').style.display = 'none';
+            document.getElementById('drawButton').style.display = 'inline-block';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing); 
+        });
+
+        // 그리기 버튼 클릭 시
         document.getElementById('drawButton').addEventListener('click', function() {
             this.style.display = 'none';
             document.getElementById('stopDrawButton').style.display = 'inline-block';
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
+            context.strokeStyle = "black";
         });
 
+        // 그리기 정지 버튼 클릭 시
         document.getElementById('stopDrawButton').addEventListener('click', function() {
             this.style.display = 'none';
             document.getElementById('drawButton').style.display = 'inline-block';
@@ -140,16 +163,6 @@
             canvas.removeEventListener('mouseup', stopDrawing);
             isDrawing = false;
         });
-
-        const eraserBtn = document.getElementById("eraseButton");
-
-        // 지우개 기능
-        function onEraserClick() {
-            context.strokeStyle = "white";
-        }
-
-        eraserBtn.addEventListener("click", onEraserClick);
-
         // 색 변경 기능
         function oncolorChange(event) {
             context.strokeStyle = event.target.value;
