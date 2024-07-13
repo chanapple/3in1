@@ -44,7 +44,7 @@
 			<button id="red" class="color_button"></button>
 			<button id="green" class="color_button"></button>
 
-			<!-- 채우기/저장 버튼 -->
+			<!-- 모드 선택/저장 버튼 -->
 			<div class="controls_btns">
 				<button id="photoMode" value="pen">Pen</button>
 				<button id="photoSave" onclick="document.execCommand('SaveAs')">
@@ -159,13 +159,22 @@
 				setupColorButtonListener("red", canvas);
 				setupColorButtonListener("green", canvas);
 
-				document
-					.getElementById("photoMode")
-					.addEventListener("click", event => {
-						if (event.target.value == "pen") {
-							drawingControl = fale;
-						}
-					});
+				//photoMode 변경 이벤트 리스터
+				let modeButton = document.getElementById("photoMode"); //photoMode 버튼 찾아서 할당함.
+				modeButton.addEventListener("click", event => {
+					//pen 상태에서 클릭했을 때
+					if (event.target.value == "pen") {
+						drawingControl = false; //pen 비활성화
+						event.target.value = "select";
+						modeButton.textContent = "Select";
+					} else {
+						//select 상태에서 클릭했을 때
+						drawingControl = true; //pen 활성화
+						event.target.value = "pen";
+						modeButton.textContent = "Pen";
+					}
+					canvas.isDrawingMode = drawingControl;
+				});
 
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
