@@ -10,15 +10,19 @@ import {
 class play extends Scene {
 	constructor() {
 		super({key: "playScene"});
+
+		this.worldWidth = 8000;
+		this.worldHeight = 6400;
+		this.displayWidth = 1200;
+		this.displayHeight = 800;
+
 		this.stars;
 		this.player;
 		this.cursors;
 		this.score = 0;
 		this.scoreText;
-		this.worldWidth = 8000;
-		this.worldHeight = 6400;
-		this.displayWidth = 1200;
-		this.displayHeight = 800;
+
+		this.isJumping = false;
 	}
 
 	mapBuilder(mapWidth, mapHeight, step, groundBlock) {
@@ -61,20 +65,27 @@ class play extends Scene {
 		// 그룹의 물리 속성 갱신
 		groundBlock.refresh();
 
-		this.player = this.physics.add.sprite(4000, 3168, "knight").setScale(2.5);
+		this.player = this.physics.add.sprite(4000, 3100, "knight").setScale(2.5);
 		this.player.setBounce(0.2);
 
 		this.anims.create({
 			key: "walk",
 			frames: this.anims.generateFrameNumbers("knight", {start: 26, end: 31}),
-			frameRate: 10,
+			frameRate: 12,
 			repeat: -1
 		});
 
 		this.anims.create({
-			key: "turn",
+			key: "jump",
+			frames: this.anims.generateFrameNumbers("knight", {start: 39, end: 42}),
+			frameRate: 12
+		});
+
+		this.anims.create({
+			key: "idle",
 			frames: this.anims.generateFrameNumbers("knight", {start: 0, end: 3}),
-			frameRate: 20
+			frameRate: 3,
+			repeat: -1
 		});
 
 		this.scoreText = this.add.text(16, 16, "score: 0", {
@@ -86,9 +97,9 @@ class play extends Scene {
 
 		this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
 		this.cameras.main.startFollow(this.player);
-		
+
 		// 마우스 컨텍스트 메뉴 비활성화
-        this.input.mouse.disableContextMenu();
+		this.input.mouse.disableContextMenu();
 
 		groundBlock.on("pointerdown", function (params) {});
 	}
@@ -98,18 +109,23 @@ class play extends Scene {
 		if (cursors.left.isDown) {
 			this.player.setFlipX(true);
 			this.player.setVelocityX(-260);
-			this.player.anims.play("walk", true);
+			if (this.player.body.touching.down) {
+				this.player.anims.play("walk", true);
+			}
 		} else if (cursors.right.isDown) {
 			this.player.setFlipX(false);
 			this.player.setVelocityX(260);
-			this.player.anims.play("walk", true);
-		} else {
+			if (this.player.body.touching.down) {
+				this.player.anims.play("walk", true);
+			}
+		} else if (this.player.body.touching.down) {
 			this.player.setVelocityX(0);
-			this.player.anims.play("turn");
+			this.player.anims.play("idle", true);
 		}
 
 		if (cursors.up.isDown && this.player.body.touching.down) {
 			this.player.setVelocityY(-330);
+			this.player.anims.play("jump");
 		}
 	}
 }
