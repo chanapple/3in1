@@ -46,13 +46,18 @@
 
 			<!-- 모드 선택/저장 버튼 -->
 			<div class="controls_btns">
-				<button id="photoMode" value="pen">Pen</button>
+				<button id="photoMode" value="pen">State: Pen</button>
 				<button id="photoSave" onclick="document.execCommand('SaveAs')">
 					SAVE
 				</button>
 			</div>
 			<!-- 파일선택 -->
 			<input type="file" id="photofile" />
+
+			<!-- 스티커 불러오기 버튼 -->
+			<div>
+				<button id="sticker">스티커</button>
+			</div>
 
 			<!-- 지우개 버튼 -->
 			<button id="erase">ERASE</button>
@@ -169,12 +174,12 @@
 					if (event.target.value == "pen") {
 						drawingControl = false; //pen 비활성화
 						event.target.value = "select";
-						modeButton.textContent = "Select";
+						modeButton.textContent = "State: Select";
 					} else {
 						//select 상태에서 클릭했을 때
 						drawingControl = true; //pen 활성화
 						event.target.value = "pen";
-						modeButton.textContent = "Pen";
+						modeButton.textContent = "State: Pen";
 					}
 					canvas.isDrawingMode = drawingControl;
 				});
@@ -225,9 +230,25 @@
 						// 펜 모드 비활성화하고 선택 모드로 전환
 						drawingControl = false;
 						modeButton.value = "select";
-						modeButton.textContent = "Select";
+						modeButton.textContent = "State: Select";
 						canvas.isDrawingMode = drawingControl;
 					});
+
+				//스티커추가 이벤트 리스너
+				var stickerImg = new Image();
+				document.getElementById("sticker").addEventListener("click", () => {
+					stickerImg.onload = function (img) {
+						var sticker = new fabric.Image(stickerImg);
+						canvas.add(sticker);
+					};
+					stickerImg.src =
+						"https://item.kakaocdn.net/do/7678ffa4ee52772236aa5e5d6e16b0acf43ad912ad8dd55b04db6a64cddaf76d";
+					// 펜 모드 비활성화하고 선택 모드로 전환
+					drawingControl = false;
+					modeButton.value = "select";
+					modeButton.textContent = "State: Select";
+					canvas.isDrawingMode = drawingControl;
+				});
 
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
