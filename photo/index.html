@@ -52,11 +52,7 @@
 				</button>
 			</div>
 			<!-- 파일선택 -->
-			<input
-				type="file"
-				id="photofile"
-				onchange="loadFile()"
-			/><!--파일 선택시 loadFile 함수를 호출-->
+			<input type="file" id="photofile" />
 
 			<!-- 지우개 버튼 -->
 			<button id="erase">ERASE</button>
@@ -109,15 +105,10 @@
 				link.click();
 			}
 
-			//파일선택 함수 정의
-			function loadFile() {
-				const fileInput = document.getElementById("photofile");
-				const event = {target: fileInput};
-				onFileChange(event);
-			}
 			//변수
 			//초기화 제어 변수
 			let clearControl = false;
+			//그리기 모드 제어 변수
 			let drawingControl = true;
 			//처음 캔버스 색상
 			let canvasBackgroundColor = "white";
@@ -171,7 +162,7 @@
 				setupColorButtonListener("red", canvas);
 				setupColorButtonListener("green", canvas);
 
-				//photoMode 변경 이벤트 리스터
+				//"photoMode" 변경 이벤트 리스터
 				let modeButton = document.getElementById("photoMode"); //photoMode 버튼 찾아서 할당함.
 				modeButton.addEventListener("click", event => {
 					//pen 상태에서 클릭했을 때
@@ -188,21 +179,39 @@
 					canvas.isDrawingMode = drawingControl;
 				});
 
+				//"파일 업로드"
+				document
+					.getElementById("photofile")
+					.addEventListener("change", event => {
+						//로컬 파일의 url 읽어오기
+						const file = event.target.files[0];
+						const url = URL.createObjectURL(file);
+						console.log(url);
+						//이미지로 불러오기
+						var newImage = new Image();
+						newImage.src = url;
+						newImage.onload = function (img) {
+							var photo = new fabric.Image(newImage, {
+								width: 500,
+								height: 500,
+								left: 50,
+								top: 70,
+								scaleX: 0.25,
+								scaleY: 0.25
+							});
+							canvas.add(photo);
+						};
+						// 펜 모드 비활성화하고 선택 모드로 전환
+						drawingControl = false;
+						modeButton.value = "select";
+						modeButton.textContent = "Select";
+						canvas.isDrawingMode = drawingControl;
+					});
+
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
 				if (saveBtn) {
 					saveBtn.addEventListener("click", handleSaveClick);
-				}
-				//"파일" 버튼 클릭에 대한 이벤트 리스너
-				function onFileChange(event) {
-					const file = event.target.files[0]; // files 배열의 첫 번째 파일
-					const url = URL.createObjectURL(file); // 파일 객체로부터 접근 가능한 URL 생성
-					const image = new Image();
-					image.src = url; // 이미지 객체의 소스를 파일의 URL로 설정
-					image.onload = function () {
-						ctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-						event.target.value = null; // 값 초기화
-					};
 				}
 
 				// "지우개" 버튼 클릭에 대한 이벤트 리스너
