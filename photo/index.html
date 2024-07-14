@@ -190,15 +190,36 @@
 						//이미지로 불러오기
 						var newImage = new Image();
 						newImage.src = url;
+						//이미지 불러오기
 						newImage.onload = function (img) {
+							let imgWidth = this.width;
+							let imgHeight = this.height;
+							let screenWidth = window.innerWidth; //윈도우 화면 가로 크기
+							let screenHeight = window.innerHeight; //윈도우 화면 세로 크기
+							let ratio = 1; //비율 저장 변수(크지 않으면 원본으로 나옴.)
+
+							//이미지가 윈도우 화면 크기 보다 크다면
+							if (imgWidth > screenWidth || imgHeight > screenHeight) {
+								//윈도우 크기에 맞게 축소할 이미지 비율 구하기
+								let widthRatio = screenWidth / imgWidth;
+								let heightRatio = (screenHeight - 150) / imgHeight;
+								//이미지 가로/세로 비율 중 어디에 맞출지 정하기(더 큰쪽=비율은 더 작아짐)
+								if (heightRatio < widthRatio) {
+									ratio = heightRatio;
+								} else {
+									ratio = widthRatio;
+								}
+							}
+							//이미지 객체 만듦.
 							var photo = new fabric.Image(newImage, {
-								width: 500,
-								height: 500,
-								left: 50,
-								top: 70,
-								scaleX: 0.25,
-								scaleY: 0.25
+								width: imgWidth,
+								height: imgHeight
 							});
+							//구한 비율에 맞게 이미지 크기 설정, 이미지에 맞게 캔버스 크기 설정.
+							photo.scale(ratio);
+							canvas.setWidth(imgWidth * ratio);
+							canvas.setHeight(imgHeight * ratio);
+							canvas.renderAll();
 							canvas.add(photo);
 						};
 						// 펜 모드 비활성화하고 선택 모드로 전환
