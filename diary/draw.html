@@ -39,6 +39,12 @@
         background-color: #fff;
     }
    
+    #imgObj {
+        position: absolute;
+        z-index: 2;
+        cursor: grab;
+        display: none; /* 처음에는 이미지를 숨김 */
+    }
     </style>
 </head>
 <body>
@@ -49,10 +55,14 @@
                     <img src="/diary/image/paint-brush-icon.png" width="30px" style="padding: 10px;">
                 </button>
                 <button id="stopDrawButton" style="display: none; ">
-                    <img src="/diary/image/paint-brush-icon.png" width="30px" style="background-color: rgb(228, 228, 228); padding: 10px;">
+                    <img src="/diary/image/paint-brush-icon.png" width="30px" style="background-color: rgb(231, 231, 231); padding: 10px;">
                 </button>
                 <button id="eraseButton" style="margin-right: 10px;">지우기</button>
+                <button id="imageBtn" style="margin-right: 10px;">사진</button>
+                <input type="file" id="file-input" multiple>
+                
             </div>
+            
             <div style="display: flex; flex-direction: row; align-items: center; ">
                 <button class="dropdown" style="display: flex; flex-direction: row; align-items: center;">
                     <img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 19px;">
@@ -60,7 +70,101 @@
             </div>
         </div>
         
-        <div class="toolbar" style="position: absolute; z-index: 2;">
+        <img id="imgObj" alt="Image Preview" >
+
+        <script>
+            const fileInput = document.getElementById('file-input');
+            const imageObj = document.getElementById('imgObj');
+
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imageObj.src = e.target.result;
+                        imageObj.style.display = 'block'; // 이미지 로드 후 표시
+                        fileInput.style.display = 'none'; // 파일 입력 요소 숨김
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imageObj.src = '';
+                    imageObj.style.display = 'none'; // 유효하지 않은 파일일 경우 이미지 숨김
+                }
+            });
+
+            imageObj.addEventListener('mousedown', dragStart);
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('mousemove', drag);
+
+            function dragStart(e) {
+                const stopDrawButton = document.getElementById('stopDrawButton');
+                if (stopDrawButton.style.display !== 'none') {
+                    e.preventDefault(); 
+                    return;
+                }
+
+                if (e.button === 0 && e.target === imageObj) { 
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+
+                    const style = window.getComputedStyle(imageObj);
+                    initialX = parseInt(style.left, 10) || 0;
+                    initialY = parseInt(style.top, 10) || 0;
+
+                    imageObj.style.cursor = 'grabbing'; // Change cursor when dragging
+                }
+            }
+
+            function dragEnd() {
+                if (isDragging) {
+                    isDragging = false;
+                    imageObj.style.cursor = 'grab'; // 드래그 종료 시 커서 변경
+                }
+            }
+
+            function drag(e) {
+                if (isDragging && e.button === 0) {
+                    e.preventDefault();
+
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+
+                    imageObj.style.left = `${initialX + dx}px`;
+                    imageObj.style.top = `${initialY + dy}px`;
+                }
+            }
+
+            // 초기 커서 설정
+            imageObj.style.cursor = 'grab';  
+
+             // 이미지에 마우스 진입 시 이벤트 추가
+             imageObj.addEventListener('mouseenter', function(e) {
+                const stopDrawButton = document.getElementById('stopDrawButton');
+                if (stopDrawButton.style.display !== 'none') {
+                    imageObj.style.pointerEvents = 'none'; // 마우스 이벤트 무시
+                    return;
+                }
+            });
+
+            document.getElementById('file-input').style.display = 'none';
+
+            // 파일 입력 요소 토글 처리
+            document.getElementById('imageBtn').addEventListener('click', function() {
+                const fileInput = document.getElementById('file-input');
+                if (fileInput.style.display === 'none') {
+                    fileInput.style.display = 'block';
+                } else {
+                    fileInput.style.display = 'none';
+                }
+            });
+            
+         </script>
+
+        <div class="toolbar" style="position: absolute; z-index: 3;">
             <input id="color" type="color">
             <br>
             <label for="slider">PX</label>
@@ -171,5 +275,7 @@
         color.addEventListener("change", oncolorChange);
 
     </script>
+  
+    
 </body>
 </html>
