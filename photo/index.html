@@ -58,6 +58,8 @@
 			<div>
 				<button id="sticker">스티커</button>
 			</div>
+			<!-- 실행취소 -->
+			<button id="undo">그리기 되돌리기</button>
 
 			<!-- 지우개 버튼 -->
 			<button id="erase">ERASE</button>
@@ -110,6 +112,11 @@
 				link.click();
 			}
 
+			//상태 기록 함수
+			function saveHistory(state) {
+				history.push(state);
+			}
+
 			//변수
 			//초기화 제어 변수
 			let clearControl = false;
@@ -119,6 +126,8 @@
 			let canvasBackgroundColor = "white";
 			let brush_color;
 			let brush_size;
+			//상태 기록 저장
+			let history = [];
 
 			//캔버스
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
@@ -227,11 +236,11 @@
 							canvas.renderAll();
 							canvas.add(photo);
 						};
-						// 펜 모드 비활성화하고 선택 모드로 전환
-						drawingControl = false;
-						modeButton.value = "select";
-						modeButton.textContent = "State: Select";
-						canvas.isDrawingMode = drawingControl;
+						// // 펜 모드 비활성화하고 선택 모드로 전환
+						// drawingControl = false;
+						// modeButton.value = "select";
+						// modeButton.textContent = "State: Select";
+						// canvas.isDrawingMode = drawingControl;
 					});
 
 				//스티커추가 이벤트 리스너
@@ -243,11 +252,11 @@
 					};
 					stickerImg.src =
 						"https://item.kakaocdn.net/do/7678ffa4ee52772236aa5e5d6e16b0acf43ad912ad8dd55b04db6a64cddaf76d";
-					// 펜 모드 비활성화하고 선택 모드로 전환
-					drawingControl = false;
-					modeButton.value = "select";
-					modeButton.textContent = "State: Select";
-					canvas.isDrawingMode = drawingControl;
+					// // 펜 모드 비활성화하고 선택 모드로 전환
+					// drawingControl = false;
+					// modeButton.value = "select";
+					// modeButton.textContent = "State: Select";
+					// canvas.isDrawingMode = drawingControl;
 				});
 
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
@@ -256,10 +265,27 @@
 					saveBtn.addEventListener("click", handleSaveClick);
 				}
 
+				//"실행 취소"에 대한 이벤트 리스너
+				document.getElementById("undo").addEventListener("click", () => {
+					if (history.length > 0) {
+						history.pop();
+					}
+					if (canvas._objects.length > 0) {
+						canvas._objects.pop();
+					}
+					canvas.renderAll();
+					console.log(history);
+					console.log(canvas._objects);
+				});
+
 				// "지우개" 버튼 클릭에 대한 이벤트 리스너
 				document.getElementById("erase").addEventListener("click", () => {
 					canvas.freeDrawingBrush.color = canvasBackgroundColor; // 색상을 캔버스 배경색으로 설정
 				});
+
+				canvas.on("object:added", saveHistory);
+				canvas.on("object:modified", saveHistory);
+				canvas.on("object:removed", saveHistory);
 
 				//캔버스 초기화
 				document.getElementById("clearCanvas").addEventListener("click", () => {
