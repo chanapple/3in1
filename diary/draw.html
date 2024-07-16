@@ -57,10 +57,11 @@
                 <button id="stopDrawButton" style="display: none; ">
                     <img src="/diary/image/paint-brush-icon.png" width="30px" style="background-color: rgb(231, 231, 231); padding: 10px;">
                 </button>
+                <button id="highlighterBtn" style="margin-right: 10px; display: inline-block;">형광펜</button>
+                <button id="stopHighlighterBtn" style="margin-right: 10px; display: none;">형광펜 정지</button>
                 <button id="eraseButton" style="margin-right: 10px;">지우기</button>
                 <button id="imageBtn" style="margin-right: 10px;">사진</button>
                 <input type="file" id="file-input" multiple>
-                
             </div>
             
             <div style="display: flex; flex-direction: row; align-items: center; ">
@@ -224,7 +225,8 @@
         var lastX = 0;
         var lastY = 0;
 		let lineWidth = 10;
-
+        let isHighlighterMode = false; // 형광펜 모드인지 여부를 나타내는 플래그
+        
         context.canvas.width  = window.innerWidth;
         context.canvas.height = window.innerHeight;
 
@@ -248,6 +250,12 @@
             context.beginPath();
             context.moveTo(lastX, lastY);
             context.lineTo(event.offsetX, event.offsetY);
+            if (isHighlighterMode) {
+                // 형광펜 모드
+                context.globalAlpha = 0.5;
+            } else {
+                context.globalAlpha = 1; // 일반 그리기 모드
+            }
 			context.lineWidth = lineWidth; 
             context.stroke();
             [lastX, lastY] = [event.offsetX, event.offsetY];
@@ -255,6 +263,7 @@
 
         function stopDrawing() {
             isDrawing = false;
+            context.globalAlpha = 1; // 그리기가 종료되면 불투명도를 원래대로 설정
         }
 
 
@@ -272,11 +281,13 @@
         document.getElementById('drawButton').addEventListener('click', function() {
             this.style.display = 'none';
             document.getElementById('stopDrawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
             context.strokeStyle = "black";
-           
+            isHighlighterMode = false; // 형광펜 모드 해제
         });
 
         // 그리기 정지 버튼 클릭 시
@@ -287,12 +298,36 @@
             canvas.removeEventListener('mousemove', draw);
             canvas.removeEventListener('mouseup', stopDrawing);
             isDrawing = false;
+            context.globalAlpha = 1; // 그리기가 정지되면 불투명도를 원래대로 설정
         });
+
+        // 형광펜 버튼 클릭 시
+        document.getElementById('highlighterBtn').addEventListener('click', function() {
+            document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('stopDrawButton').style.display = 'none';
+            document.getElementById('stopHighlighterBtn').style.display = 'inline-block';
+            this.style.display = 'none';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            isHighlighterMode = true; // 형광펜 모드 활성화
+        });
+
+        // 형광펜 정지 버튼 클릭 시 
+        document.getElementById('stopHighlighterBtn').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            isHighlighterMode = false; // 형광펜 모드 활성화
+        });
+
         // 색 변경 기능
         function oncolorChange(event) {
             context.strokeStyle = event.target.value;
         }
-
+        
         color.addEventListener("change", oncolorChange);
 
     </script>
