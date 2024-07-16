@@ -9,6 +9,7 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/locales-all.min.js'></script>
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
+
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar'); 
@@ -16,9 +17,9 @@
                 height: '700px',
                 expandRows: true,
                 headerToolbar: {    // 달력 헤더
-                    left: 'prev,next',          
-                    center: 'title',          
-                    right: 'today'        
+                    left: 'prev,next',      //전달,다음달    
+                    center: 'title',          //2024년 07월
+                    right: 'today'        //오늘로 바로가기
                 },
                 initialView: 'dayGridMonth', // 첫화면을 달력으로
                 editable: true, // 수정 가능
@@ -76,6 +77,14 @@
     }
     .fc-header-toolbar {
         padding-top: 2em;
+    }
+    .fc-day-sun a {
+        color: red;
+        text-decoration: none;
+    }
+    .fc-day-sat a {
+        color: blue;
+        text-decoration: none;
     }
 </style>
 </head>
