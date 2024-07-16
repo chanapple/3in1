@@ -76,28 +76,37 @@
             const fileInput = document.getElementById('file-input');
             const imageObj = document.getElementById('imgObj');
 
-            let isDragging = false;
-            let startX, startY, initialX, initialY;
-
             fileInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imageObj.src = e.target.result;
-                        imageObj.style.display = 'block'; // 이미지 로드 후 표시
-                        fileInput.style.display = 'none'; // 파일 입력 요소 숨김
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    imageObj.src = '';
-                    imageObj.style.display = 'none'; // 유효하지 않은 파일일 경우 이미지 숨김
+                const files = event.target.files;
+                for (let file of files) {
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const newImageObj = document.createElement('img');
+                            newImageObj.src = e.target.result;
+                            newImageObj.style.position = 'absolute';
+                            newImageObj.style.zIndex = 2;
+                            newImageObj.style.cursor = 'grab';
+                            document.body.appendChild(newImageObj);
+
+                            newImageObj.addEventListener('mousedown', dragStart);
+                            document.addEventListener('mouseup', dragEnd);
+                            document.addEventListener('mousemove', drag);
+
+                            newImageObj.addEventListener('mouseenter', function(e) {
+                                const stopDrawButton = document.getElementById('stopDrawButton');
+                                if (stopDrawButton.style.display === 'none') {
+                                    newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
+                                }
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 }
             });
 
-            imageObj.addEventListener('mousedown', dragStart);
-            document.addEventListener('mouseup', dragEnd);
-            document.addEventListener('mousemove', drag);
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
 
             function dragStart(e) {
                 const stopDrawButton = document.getElementById('stopDrawButton');
@@ -106,8 +115,9 @@
                     return;
                 }
 
-                if (e.button === 0 && e.target === imageObj) { 
+                if (e.button === 0 && e.target.tagName === 'IMG') { 
                     isDragging = true;
+                    const imageObj = e.target;
                     startX = e.clientX;
                     startY = e.clientY;
 
@@ -115,51 +125,61 @@
                     initialX = parseInt(style.left, 10) || 0;
                     initialY = parseInt(style.top, 10) || 0;
 
-                    imageObj.style.cursor = 'grabbing'; // Change cursor when dragging
+                    imageObj.style.cursor = 'grabbing';
+                    
                 }
             }
 
-            function dragEnd() {
+            function dragEnd(e) {
                 if (isDragging) {
                     isDragging = false;
-                    imageObj.style.cursor = 'grab'; // 드래그 종료 시 커서 변경
+                    const imageObj = document.querySelector('img[style*="grabbing"]');
+                    if (imageObj) {
+                        imageObj.style.cursor = 'grab';
+                    }
                 }
             }
 
             function drag(e) {
                 if (isDragging && e.button === 0) {
                     e.preventDefault();
+                    const imageObj = document.querySelector('img[style*="grabbing"]');
 
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
+                    if (imageObj) {
+                        const dx = e.clientX - startX;
+                        const dy = e.clientY - startY;
 
-                    imageObj.style.left = `${initialX + dx}px`;
-                    imageObj.style.top = `${initialY + dy}px`;
+                        imageObj.style.left = `${initialX + dx}px`;
+                        imageObj.style.top = `${initialY + dy}px`;
+                    }
                 }
             }
 
-            // 초기 커서 설정
-            imageObj.style.cursor = 'grab';  
+                // 초기 커서 설정
+                imageObj.style.cursor = 'grab';  
 
-             // 이미지에 마우스 진입 시 이벤트 추가
-             imageObj.addEventListener('mouseenter', function(e) {
-                const stopDrawButton = document.getElementById('stopDrawButton');
-                if (stopDrawButton.style.display !== 'none') {
-                    imageObj.style.pointerEvents = 'none'; // 마우스 이벤트 무시
-                    return;
-                }
-            });
+                // 이미지에 마우스 진입 시 이벤트 추가
+                imageObj.addEventListener('mouseenter', function(e) {
+                    const stopDrawButton = document.getElementById('stopDrawButton');
+                    if (stopDrawButton.style.display !== 'none') {
+                        imageObj.style.pointerEvents = 'none'; // 마우스 이벤트 무시
+                        return;
+                    }
+                });
 
             document.getElementById('file-input').style.display = 'none';
 
-            // 파일 입력 요소 토글 처리
             document.getElementById('imageBtn').addEventListener('click', function() {
                 const fileInput = document.getElementById('file-input');
-                if (fileInput.style.display === 'none') {
-                    fileInput.style.display = 'block';
-                } else {
-                    fileInput.style.display = 'none';
+
+                const drawButton = document.getElementById('drawButton');
+
+                if (stopDrawButton.style.display !== 'none') {
+                    stopDrawButton.style.display = 'none';
+                    drawButton.style.display = 'inline-block';
                 }
+                
+                fileInput.style.display = fileInput.style.display === 'none' ? 'block' : 'none';
             });
             
          </script>
@@ -256,6 +276,7 @@
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
             context.strokeStyle = "black";
+           
         });
 
         // 그리기 정지 버튼 클릭 시
