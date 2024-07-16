@@ -14,8 +14,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar'); 
             var calendar = new FullCalendar.Calendar(calendarEl, { //full-calendar 생성
-                height: '700px',
-                expandRows: true,
+                height: '670px',    //높이 조절
+                expandRows: true,   //
                 headerToolbar: {    // 달력 헤더
                     left: 'prev,next',      //전달,다음달    
                     center: 'title',          //2024년 07월
@@ -85,6 +85,18 @@
     .fc-day-sat a {
         color: blue;
         text-decoration: none;
+    }
+    .fc-prev-button.fc-button.fc-button-primary {
+        background: white;
+        color: black;
+    }
+    .fc-next-button.fc-button.fc-button-primary {
+        background: white;
+        color: black;
+    }
+    .fc-today-button.fc-button.fc-button-primary {
+        background: white;
+        color: black;
     }
 </style>
 </head>
