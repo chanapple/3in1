@@ -85,6 +85,7 @@
                 </button>
                 <button id="imageBtn" style="margin-right: 10px;">사진</button>
                 <input type="file" id="file-input" multiple>
+                <button id="saveButton">Save</button>
             </div>
             
             <div style="display: flex; flex-direction: row; align-items: center; ">
@@ -435,6 +436,50 @@
         }
         
         color.addEventListener("change", oncolorChange);
+
+        // 로컬스토리지에 캔버스 저장하는 기능 
+        function saveCanvasData() {
+            localStorage.setItem('canvasImage', canvas.toDataURL());
+
+            localStorage.setItem('lineWidth', lineWidth);
+            localStorage.setItem('color', color.value);
+
+            // 저장 잘 됐는지 확인용 
+            alert('캔버스 데이터 저장 성공');
+        }
+
+        // 저장 버튼 클릭 시 
+        document.getElementById('saveButton').addEventListener('click', saveCanvasData);
+
+        // 로컬스토리지로부터 저장된 캔버스 데이터 불러오는 기능
+        function loadCanvasData() {
+            const savedImage = localStorage.getItem('canvasImage');
+            if (savedImage) {
+                const img = new Image();
+                img.onload = function() {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0);
+                };
+                img.src = savedImage;
+            }
+
+            const savedLineWidth = localStorage.getItem('lineWidth');
+            if (savedLineWidth) {
+                lineWidth = parseInt(savedLineWidth);
+                document.getElementById('slider').value = lineWidth;
+                document.getElementById('lineWidth').innerText = String(lineWidth);
+            }
+
+            const savedColor = localStorage.getItem('color');
+            if (savedColor) {
+                color.value = savedColor;
+                context.strokeStyle = savedColor;
+            }
+            
+        }
+
+        window.addEventListener('load', loadCanvasData);
+
 
     </script>
   
