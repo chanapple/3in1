@@ -98,8 +98,8 @@
 		</span>
 
 		<script>
-			//미니 팔레트 함수 정의
 			// 함수
+			//미니 팔레트 함수 정의
 			function setupColorButtonListener(buttonId, canvas) {
 				//미니 팔레트 버튼 클릭 시 brush_color 변경.
 				document.getElementById(buttonId).addEventListener("click", () => {
@@ -109,17 +109,20 @@
 					colorPickerBackgroundColor(brush_color); //클릭한 버튼의 색상으로 팔레트 색상 변경.
 				});
 			}
+
 			//인자 값으로 팔레트 색상 변경하는 함수.
 			function colorPickerBackgroundColor(brush_color) {
 				document.querySelectorAll(".sp-colorize").forEach(div => {
 					div.style.backgroundColor = brush_color;
 				});
 			}
+
 			// 모든 .color_button 클래스 버튼에 대해 id=backgroundColor로 설정함.(css 통일 위해 사용)
 			document.querySelectorAll(".color_button").forEach(button => {
 				button.style.backgroundColor = button.id;
 				button.value = button.id;
 			});
+
 			//저장 함수 정의
 			function handleSaveClick() {
 				const image = canvas.toDataURL("image/png");
@@ -128,10 +131,26 @@
 				link.download = "PaintJS[EXPORT]";
 				link.click();
 			}
+
 			//상태 기록 함수
 			function saveHistory(state) {
 				history.push(state);
 			}
+
+			//Ctrl+Z 단축키(=뒤로가기) 함수
+			function keysPressed(e) {
+				keys[e.keyCode] = true;
+				// Ctrl + Z
+				if (keys[17] && keys[90]) {
+					console.log("key press");
+					document.getElementById("undo").click();
+				}
+			}
+			function keysReleased(e) {
+				keys[e.keyCode] = false;
+				console.log("key releas");
+			}
+
 			//변수
 			//초기화 제어 변수
 			let clearControl = false;
@@ -143,6 +162,8 @@
 			let brush_size;
 			//상태 기록 저장
 			let history = [];
+			let keys = [];
+
 			//캔버스
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
@@ -151,8 +172,10 @@
 					isDrawingMode: drawingControl, // 그리기 모드 활성화
 					backgroundColor: canvasBackgroundColor // 캔버스 배경색을 흰색으로 설정
 				});
+
 				// freeDrawingBrush가 undefined라서 PencilBrush를 수동으로 설정함.
 				canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+
 				// 기본 그리기 브러시 너비와 색상 설정.
 				canvas.freeDrawingBrush.width = 5;
 				canvas.freeDrawingBrush.color = "#007FA1";
@@ -167,6 +190,7 @@
 						canvas.freeDrawingBrush.width = brush_size;
 						console.log(brush_size);
 					});
+
 				// 팔레트 설정
 				$("#color-picker").spectrum({
 					type: "component",
@@ -181,6 +205,7 @@
 					brush_color = "#" + tinycolor.toHex();
 					canvas.freeDrawingBrush.color = brush_color;
 				});
+
 				// 미니 팔레트 클릭에 대한 이벤트 리스너
 				setupColorButtonListener("#E1B1CA", canvas);
 				setupColorButtonListener("#B19DC9", canvas);
@@ -246,14 +271,9 @@
 							canvas.renderAll();
 							canvas.add(photo);
 						};
-						// // 펜 모드 비활성화하고 선택 모드로 전환
-						// drawingControl = false;
-						// modeButton.value = "select";
-						// modeButton.textContent = "State: Select";
-						// canvas.isDrawingMode = drawingControl;
 					});
-				//스티커추가 이벤트 리스너
 
+				//스티커추가 이벤트 리스너
 				const stickerImg = new Image(); // const 또는 let으로 한 번만 선언
 				let selectedValue = ""; // 선택된 값을 저장할 변수
 
@@ -297,18 +317,14 @@
 							};
 							stickerImg.src = imageUrl;
 						}
-
-						// // 펜 모드 비활성화하고 선택 모드로 전환
-						// drawingControl = false;
-						// modeButton.value = "select";
-						// modeButton.textContent = "State: Select";
-						// canvas.isDrawingMode = drawingControl;
 					});
+
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
 				if (saveBtn) {
 					saveBtn.addEventListener("click", handleSaveClick);
 				}
+
 				//"실행 취소"에 대한 이벤트 리스너
 				document.getElementById("undo").addEventListener("click", () => {
 					if (history.length > 0) {
@@ -321,13 +337,16 @@
 					console.log(history);
 					console.log(canvas._objects);
 				});
-				// "지우개" 버튼 클릭에 대한 이벤트 리스너
-				// document.getElementById("erase").addEventListener("click", () => {
-				// 	canvas.freeDrawingBrush.color = canvasBackgroundColor; // 색상을 캔버스 배경색으로 설정
-				// });
+
+				//history 배열에 저장.
 				canvas.on("object:added", saveHistory);
 				canvas.on("object:modified", saveHistory);
 				canvas.on("object:removed", saveHistory);
+
+				//"Ctrl+Z"에 대한 이벤트 리스너
+				window.addEventListener("keydown", keysPressed, false);
+				window.addEventListener("keyup", keysReleased, false);
+
 				//캔버스 초기화
 				document.getElementById("clearCanvas").addEventListener("click", () => {
 					canvas.clear(); // 캔버스 초기화
