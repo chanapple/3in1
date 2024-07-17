@@ -1,4 +1,45 @@
-input {
+body {
+	background-color: #fdfdfe;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	margin: 0;
+}
+
+button,
+input[type="file"],
+input[type="number"] {
+	border-radius: 12px;
+	border: none;
+	padding: 10px 15px;
+	margin: 5px;
+	font-size: 14px;
+	cursor: pointer;
+	background-color: #ffcccc;
+	box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+	transition: background-color 0.3s;
+}
+
+button:hover,
+input[type="file"]:hover,
+input[type="number"]:hover {
+	background-color: #ff9999;
+}
+
+#canvas {
+	border-radius: 15px;
+	box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.color_button {
+	width: 32px;
+	height: 32px;
+	margin: 0 3px;
+	border-radius: 10px;
+}
+#color-picker {
 	box-shadow: none;
 	color: inherit;
 	border: 1px solid #cccccc;
@@ -10,8 +51,8 @@ input {
 	margin-right: 10px;
 	background-color: white;
 }
-.color_button {
+/* .color_button {
 	width: 30px;
 	height: 30px;
 	border: solid 1px;
-}
+} */
