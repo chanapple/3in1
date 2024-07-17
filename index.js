@@ -34,7 +34,7 @@ app.use("/photo", photoRouter);
 const httpServer = createServer();
 const io = new Server(httpServer, {
 	cors: {
-		origin: "http://localhost:5000"
+		origin: "http://localhost:" + port
 	}
 });
 io.on("connection", socket => {
@@ -56,7 +56,7 @@ io.on("connection", socket => {
 		// remove this player from our players object
 		delete players[socket.id];
 		// emit a message to all players to remove this player
-		io.emit("pdisconnect", socket.id);
+		io.emit("playerdisconnect", socket.id);
 	});
 	// when a player moves, update the player data
 	socket.on("playerMovement", function (movementData) {
