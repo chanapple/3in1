@@ -12,6 +12,7 @@ const router = express.Router();
 /** 메인 라우터 */
 router.get("/", controller.viewIndex);
 router.use("/css", express.static(path.join(__dirname, "/photo/css")));
+router.use("/img", express.static(path.join(__dirname, "/photo/img")));
 
 /** 모듈 내보내기 */
 export default router;
