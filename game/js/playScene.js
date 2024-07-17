@@ -141,29 +141,49 @@ class play extends Scene {
 	}
 
 	update() {
-<<<<<<< HEAD
 		if (this.player) {
+			/** 키보드의 화살표 키를 입력 받음 */
 			const cursors = this.input.keyboard.createCursorKeys();
+
+			/** 사용자가 왼쪽 키를 눌렸는지 확인 */
 			if (cursors.left.isDown) {
+				/** 캐릭터가 왼족을 바라봄 */
 				this.player.setFlipX(true);
+				/** 캐릭터가 왼쪽으로 260의 속도로 움직임 */
 				this.player.setVelocityX(-260);
+				/** 캐릭터가 바닥에 닿아 있는지 확인 */
 				if (this.player.body.touching.down) {
+					/** 캐릭터가 바닥에 닿아 있으면 걷는 애니메이션 재생 */
 					this.player.anims.play("walk", true);
 				}
 			} else if (cursors.right.isDown) {
+				/** 사용자가 오른쪽 키를 눌렀는지 확인 */
+				/** 캐릭터가 오른쪽을 바라봄 */
 				this.player.setFlipX(false);
+				/** 캐릭터가 오른쪽으로 260의 속도로 윰직임 */
 				this.player.setVelocityX(260);
+				/** 캐릭터가 바닥에 닿아 있는지 확인 */
 				if (this.player.body.touching.down) {
+					/** 캐릭터가 바닥에 닿아 있으면 걷는 애니메이션 재생 */
 					this.player.anims.play("walk", true);
 				}
 			} else if (this.player.body.touching.down) {
+				/** 캐릭터가 바닥에 닿아 있는지 확인 */
+				/** 아무런 키의 입력을 받지 않으면 x축의 속도가 0으로 캐릭터기 움직이지 않음 */
 				this.player.setVelocityX(0);
+				/** 캐릭터의 기본 애니메시연 재생 */
 				this.player.anims.play("idle", true);
 			}
-
+			/** 위쪽 키를 눌렀는지, 캐릭터가 바닥에 닿아 있는지 확인*/
 			if (cursors.up.isDown && this.player.body.touching.down) {
+				/** 캐릭터가 위쪽으로 330의 속도로 움직임 */
 				this.player.setVelocityY(-330);
+				/** 캐릭터가 점프하는 애니메이션 재생 */
 				this.player.anims.play("jump");
+			} else if (!this.player.body.touching.down) {
+				if (this.player.body.velocity.y > 0) {
+					this.player.anims.play("drop", true);
+				}
 			}
 
 			// emit player movement
@@ -183,52 +203,6 @@ class play extends Scene {
 				x: this.player.x,
 				y: this.player.y
 			};
-=======
-		/** 키보드의 화살표 키를 입력 받음 */
-		const cursors = this.input.keyboard.createCursorKeys();
-		/** 사용자가 왼쪽 키를 눌렸는지 확인 */
-		if (cursors.left.isDown) {
-			/** 캐릭터가 왼족을 바라봄 */
-			this.player.setFlipX(true);
-			/** 캐릭터가 왼쪽으로 260의 속도로 움직임 */
-			this.player.setVelocityX(-260);
-			/** 캐릭터가 바닥에 닿아 있는지 확인 */
-			if (this.player.body.touching.down) {
-				/** 캐릭터가 바닥에 닿아 있으면 걷는 애니메이션 재생 */
-				this.player.anims.play("walk", true);
-			}
-		}
-		/** 사용자가 오른쪽 키를 눌렀는지 확인 */
-		else if (cursors.right.isDown) {
-			/** 캐릭터가 오른쪽을 바라봄 */
-			this.player.setFlipX(false);
-			/** 캐릭터가 오른쪽으로 260의 속도로 윰직임 */
-			this.player.setVelocityX(260);
-			/** 캐릭터가 바닥에 닿아 있는지 확인 */
-			if (this.player.body.touching.down) {
-				/** 캐릭터가 바닥에 닿아 있으면 걷는 애니메이션 재생 */
-				this.player.anims.play("walk", true);
-			}
-		}
-		/** 캐릭터가 바닥에 닿아 있는지 확인 */
-		else if (this.player.body.touching.down) {
-			/** 아무런 키의 입력을 받지 않으면 x축의 속도가 0으로 캐릭터기 움직이지 않음 */
-			this.player.setVelocityX(0);
-			/** 캐릭터의 기본 애니메시연 재생 */
-			this.player.anims.play("idle", true);
-		}
-		/** 위쪽 키를 눌렀는지, 캐릭터가 바닥에 닿아 있는지 확인*/
-		if (cursors.up.isDown && this.player.body.touching.down) {
-			/** 캐릭터가 위쪽으로 330의 속도로 움직임 */
-			this.player.setVelocityY(-330);
-			/** 캐릭터가 점프하는 애니메이션 재생 */
-			this.player.anims.play("jump");
->>>>>>> a633ae4eded10c7cb4f224f5785a425f656744e5
-		}
-		else if (!this.player.body.touching.down) {
-			if (this.player.body.velocity.y > 0) {
-				this.player.anims.play("drop", true);
-			}
 		}
 	}
 }
