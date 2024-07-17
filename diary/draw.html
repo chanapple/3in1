@@ -45,6 +45,18 @@
         cursor: grab;
         display: none; /* 처음에는 이미지를 숨김 */
     }
+    
+    /* 이미지 크기 조절 핸들러 */
+    .resize-handle {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        background-color: rgb(255, 255, 255);
+        border: 1px solid #000000;
+        cursor: nwse-resize;
+        z-index: 3;
+        display: none;
+    }
     </style>
 </head>
 <body>
@@ -78,111 +90,164 @@
             const imageObj = document.getElementById('imgObj');
 
             fileInput.addEventListener('change', function(event) {
-                const files = event.target.files;
-                for (let file of files) {
-                    if (file && file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const newImageObj = document.createElement('img');
-                            newImageObj.src = e.target.result;
-                            newImageObj.style.position = 'absolute';
-                            newImageObj.style.zIndex = 2;
-                            newImageObj.style.cursor = 'grab';
-                            document.body.appendChild(newImageObj);
+            const files = event.target.files;
+            for (let file of files) {
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const newImageObj = document.createElement('img');
+                        newImageObj.src = e.target.result;
+                        newImageObj.style.position = 'absolute';
+                        newImageObj.style.zIndex = 2;
+                        newImageObj.style.cursor = 'grab';
+                        document.body.appendChild(newImageObj);
 
-                            newImageObj.addEventListener('mousedown', dragStart);
-                            document.addEventListener('mouseup', dragEnd);
-                            document.addEventListener('mousemove', drag);
+                        // 크기 조절 핸들 추가
+                        const resizeHandle = document.createElement('div');
+                        resizeHandle.classList.add('resize-handle');
+                        document.body.appendChild(resizeHandle);
 
-                            newImageObj.addEventListener('mouseenter', function(e) {
-                                const stopDrawButton = document.getElementById('stopDrawButton');
-                                if (stopDrawButton.style.display === 'none') {
-                                    newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
-                                }
-                            });
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                }
-            });
+                        // 초기 크기 조절 핸들 위치 설정
+                        updateResizeHandlePosition(newImageObj, resizeHandle);
+                        
+                        // 이미지 이동 
+                        newImageObj.addEventListener('mousedown', dragStart);
+                        document.addEventListener('mouseup', dragEnd);
+                        document.addEventListener('mousemove', drag);
+                        
+                        // 이미지 크기 조절
+                        resizeHandle.addEventListener('mousedown', resizeStart);
+                        document.addEventListener('mousemove', resize);
+                        document.addEventListener('mouseup', resizeEnd);
 
-            let isDragging = false;
-            let startX, startY, initialX, initialY;
+                        newImageObj.addEventListener('mouseenter', function(e) {
+                            const stopDrawButton = document.getElementById('stopDrawButton');
+                            if (stopDrawButton.style.display === 'none') {
+                                newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
+                            }
+                        });
 
-            function dragStart(e) {
-                const stopDrawButton = document.getElementById('stopDrawButton');
-                if (stopDrawButton.style.display !== 'none') {
-                    e.preventDefault(); 
-                    return;
-                }
+                        newImageObj.addEventListener('click', function() {
+                            resizeHandle.style.display = 'block';
+                        });
 
-                if (e.button === 0 && e.target.tagName === 'IMG') { 
-                    isDragging = true;
-                    const imageObj = e.target;
-                    startX = e.clientX;
-                    startY = e.clientY;
-
-                    const style = window.getComputedStyle(imageObj);
-                    initialX = parseInt(style.left, 10) || 0;
-                    initialY = parseInt(style.top, 10) || 0;
-
-                    imageObj.style.cursor = 'grabbing';
-                    
+                        document.addEventListener('click', function(e) {
+                            if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
+                                resizeHandle.style.display = 'none';
+                            }
+                        });
+                    };
+                    reader.readAsDataURL(file);
                 }
             }
+        });
 
-            function dragEnd(e) {
-                if (isDragging) {
-                    isDragging = false;
-                    const imageObj = document.querySelector('img[style*="grabbing"]');
-                    if (imageObj) {
-                        imageObj.style.cursor = 'grab';
-                    }
-                }
+        let isResizing = false;
+        let img, resizeHandle, startWidth, startHeight, startMouseX, startMouseY;
+
+        function updateResizeHandlePosition(imageObj, handle) {
+            handle.style.left = `${imageObj.offsetLeft + imageObj.clientWidth - 5}px`;
+            handle.style.top = `${imageObj.offsetTop + imageObj.clientHeight - 5}px`;
+        }
+
+        function resizeStart(e) {
+            isResizing = true;
+            img = e.target.previousElementSibling;
+            resizeHandle = e.target;
+            startWidth = img.clientWidth;
+            startHeight = img.clientHeight;
+            startMouseX = e.clientX;
+            startMouseY = e.clientY;
+            e.preventDefault();
+        }
+
+        function resize(e) {
+            if (isResizing) {
+                const newWidth = startWidth + (e.clientX - startMouseX);
+                const newHeight = startHeight + (e.clientY - startMouseY);
+                img.style.width = `${newWidth}px`;
+                img.style.height = `${newHeight}px`;
+                updateResizeHandlePosition(img, resizeHandle);
+            }
+        }
+
+        function resizeEnd(e) {
+            if (isResizing) {
+                isResizing = false;
+                resizeHandle.style.display = 'none';
+            }
+        }
+
+        let isDragging = false;
+        let startX, startY, initialX, initialY;
+
+        function dragStart(e) {
+            const stopDrawButton = document.getElementById('stopDrawButton');
+            if (stopDrawButton.style.display !== 'none') {
+                e.preventDefault(); 
+                return;
             }
 
-            function drag(e) {
-                if (isDragging && e.button === 0) {
-                    e.preventDefault();
-                    const imageObj = document.querySelector('img[style*="grabbing"]');
+            if (e.button === 0 && e.target.tagName === 'IMG') { 
+                isDragging = true;
+                const imageObj = e.target;
+                startX = e.clientX;
+                startY = e.clientY;
 
-                    if (imageObj) {
-                        const dx = e.clientX - startX;
-                        const dy = e.clientY - startY;
+                const style = window.getComputedStyle(imageObj);
+                initialX = parseInt(style.left, 10) || 0;
+                initialY = parseInt(style.top, 10) || 0;
 
-                        imageObj.style.left = `${initialX + dx}px`;
-                        imageObj.style.top = `${initialY + dy}px`;
-                    }
+                imageObj.style.cursor = 'grabbing';
+            }
+        }
+
+        function dragEnd(e) {
+            if (isDragging) {
+                isDragging = false;
+                const imageObj = document.querySelector('img[style*="grabbing"]');
+                if (imageObj) {
+                    imageObj.style.cursor = 'grab';
+                    const resizeHandle = imageObj.nextElementSibling;
+                    updateResizeHandlePosition(imageObj, resizeHandle);
+                    resizeHandle.style.display = 'none'; // 드래그가 끝나면 핸들을 숨김
                 }
             }
+        }
 
-                // 초기 커서 설정
-                imageObj.style.cursor = 'grab';  
+        function drag(e) {
+            if (isDragging && e.button === 0) {
+                e.preventDefault();
+                const imageObj = document.querySelector('img[style*="grabbing"]');
 
-                // 이미지에 마우스 진입 시 이벤트 추가
-                imageObj.addEventListener('mouseenter', function(e) {
-                    const stopDrawButton = document.getElementById('stopDrawButton');
-                    if (stopDrawButton.style.display !== 'none') {
-                        imageObj.style.pointerEvents = 'none'; // 마우스 이벤트 무시
-                        return;
-                    }
-                });
+                if (imageObj) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
 
-            document.getElementById('file-input').style.display = 'none';
+                    imageObj.style.left = `${initialX + dx}px`;
+                    imageObj.style.top = `${initialY + dy}px`;
 
-            document.getElementById('imageBtn').addEventListener('click', function() {
-                const fileInput = document.getElementById('file-input');
-
-                const drawButton = document.getElementById('drawButton');
-
-                if (stopDrawButton.style.display !== 'none') {
-                    stopDrawButton.style.display = 'none';
-                    drawButton.style.display = 'inline-block';
+                    const resizeHandle = imageObj.nextElementSibling;
+                    updateResizeHandlePosition(imageObj, resizeHandle);
                 }
-                
-                fileInput.style.display = fileInput.style.display === 'none' ? 'block' : 'none';
-            });
+            }
+        }
+
+        // 초기 커서 설정
+        document.getElementById('file-input').style.display = 'none';
+
+        document.getElementById('imageBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('file-input');
+
+            const drawButton = document.getElementById('drawButton');
+
+            if (stopDrawButton.style.display !== 'none') {
+                stopDrawButton.style.display = 'none';
+                drawButton.style.display = 'inline-block';
+            }
             
+            fileInput.style.display = fileInput.style.display === 'none' ? 'block' : 'none';
+        });
          </script>
 
         <div class="toolbar" style="position: absolute; z-index: 3;">
@@ -272,9 +337,12 @@
             context.strokeStyle = "white"; 
             document.getElementById('stopDrawButton').style.display = 'none';
             document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing); 
+            isHighlighterMode = false; // 형광펜 모드 해제
         });
 
         // 그리기 버튼 클릭 시
