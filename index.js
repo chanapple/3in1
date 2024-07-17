@@ -17,10 +17,11 @@ env.config();
 /** 환경설정:포트 설정과 익스프레스 설정 */
 const port = process.env.PORT;
 const app = express();
+const httpServer = createServer(app);
 
 /** 환경설정:상수 경로 설정 */
 const __dirname = path.resolve();
-
+app.set("port", port);
 /** 메인 라우터 */
 app.get("/", (req, res) => {
 	res.sendFile(path.join(__dirname, "/index.html"));
@@ -31,7 +32,6 @@ app.use("/game", gameRouter);
 app.use("/diary", diaryRouter);
 app.use("/photo", photoRouter);
 
-const httpServer = createServer();
 const io = new Server(httpServer, {
 	cors: {
 		origin: "http://localhost:" + port
@@ -69,6 +69,5 @@ io.on("connection", socket => {
 var players = {};
 
 /** 시스템 시작 */
-httpServer.listen(3000);
+httpServer.listen(port);
 console.log(port + "포트, 경로: " + __dirname);
-app.listen(port);

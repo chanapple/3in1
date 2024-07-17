@@ -65,7 +65,7 @@ class play extends Scene {
 		//this.player = this.physics.add.sprite(4000, 3100, "knight").setScale(2.5);
 		//this.player.setBounce(0.2);
 
-		this.socket = io("http://localhost:3000");
+		this.socket = io();
 		var self = this;
 
 		this.otherPlayers = this.physics.add.group();
