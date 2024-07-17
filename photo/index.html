@@ -69,18 +69,18 @@
 		</div>
 		<div>
 			<!-- 브러시 크기 -->
-			<img src="photo/img/pen.png" style="width: 20px" /><input
-				id="brush_size"
-				type="number"
-				min="0"
-				max="100"
-				value="5"
-			/>
+			<label for="brush_size"
+				><img src="photo/img/pen.png" style="width: 20px"
+			/></label>
+			<input type="range" id="brush_size" min="1" max="50" value="5" />
+			<span id="brush_size_value">5</span>px
 			<!-- 미니팔레트\ > . < / -->
-			<button id="black" class="color_button"></button>
-			<button id="blue" class="color_button"></button>
-			<button id="red" class="color_button"></button>
-			<button id="green" class="color_button"></button>
+			<span style="margin-left: 15px">
+				<button id="black" class="color_button"></button>
+				<button id="blue" class="color_button"></button>
+				<button id="red" class="color_button"></button>
+				<button id="green" class="color_button"></button>
+			</span>
 		</div>
 		<span>
 			<!-- 팔레트 -->
@@ -157,6 +157,8 @@
 				document
 					.getElementById("brush_size")
 					.addEventListener("change", event => {
+						let brushSizeValue = document.getElementById("brush_size_value");
+						brushSizeValue.textContent = event.target.value;
 						brush_size = parseInt(event.target.value, 10);
 						canvas.freeDrawingBrush.width = brush_size;
 						console.log(brush_size);
