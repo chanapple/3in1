@@ -26,11 +26,12 @@
 		<div style="margin: 5px">
 			<!-- 모드 선택 -->
 			<button id="photoMode" value="pen">
-				State: <img id="mode" src="photo/img/pen.png" style="width: 20px" />
+				State:
+				<img id="mode" src="photo/img/icon/pen.png" style="width: 20px" />
 			</button>
 			<!-- 저장버튼 -->
 			<button id="photoSave" onclick="document.execCommand('SaveAs')">
-				<img src="photo/img/floppy.png" style="width: 20px" />
+				<img src="photo/img/icon/floppy.png" style="width: 20px" />
 				<!-- SAVE -->
 			</button>
 			<!-- 파일선택 -->
@@ -49,10 +50,28 @@
 				"
 			></canvas>
 		</div>
-		<div style="margin: 5px">
-			<!-- 스티커 불러오기 버튼 -->
 
-			<select name="photosticker" id="sticker">
+		<!-- 스티커 불러오기 버튼 -->
+		<div
+			id="sticker_container"
+			style="
+				width: 80%;
+				height: 70px;
+				overflow-x: auto;
+				white-space: nowrap;
+				scrollbar-width: thin;
+				scrollbar-color: gray;
+			"
+		>
+			<!-- <img
+				value="img1"
+				src="https://item.kakaocdn.net/do/219c98bd9daa7c1d0dd19a2d840b3d4ff604e7b0e6900f9ac53a43965300eb9a"
+				style="width: 100%; height: 100%; display: inline; object-fit: cover"
+			/> -->
+		</div>
+		<div style="margin: 5px">
+			<!-- <select name="photosticker" id="sticker">
+				<option value="img0">스티커</option>
 				<option value="img1">스티커 1</option>
 				<option value="img2">스티커 2</option>
 				<option value="img3">스티커 3</option>
@@ -60,27 +79,11 @@
 				<option value="img5">스티커 5</option>
 				<option value="img6">스티커 6</option>
 				<option value="img7">스티커 7</option>
-			</select>
+			</select> -->
 
-			<!-- 실행취소 -->
-			<button id="undo">
-				<img src="photo/img/undo.png" style="width: 20px" />
-				<!-- 그리기 되돌리기 -->
-			</button>
-
-			<!-- 지우개 버튼 -->
-			<!-- <button id="erase">ERASE</button> -->
-
-			<!-- 캔버스 초기화 -->
-			<button id="clearCanvas">
-				<img src="photo/img/reset.png" style="width: 20px" />
-				<!-- CLEAR -->
-			</button>
-		</div>
-		<div>
 			<!-- 브러시 크기 -->
 			<label for="brush_size"
-				><img src="photo/img/pen.png" style="width: 20px"
+				><img src="photo/img/icon/pen.png" style="width: 20px"
 			/></label>
 			<input type="range" id="brush_size" min="1" max="50" value="5" />
 			<span id="brush_size_value">5</span>px
@@ -91,11 +94,22 @@
 				<button id="#6F8EBE" class="color_button"></button>
 				<button id="#007FA1" class="color_button"></button>
 			</span>
+			<!-- 실행취소 -->
+			<button id="undo">
+				<img src="photo/img/icon/undo.png" style="width: 20px" />
+			</button>
+
+			<!-- 캔버스 초기화 -->
+			<button id="clearCanvas">
+				<img src="photo/img/icon/reset.png" style="width: 20px" />
+			</button>
 		</div>
-		<span>
-			<!-- 팔레트 -->
-			<input id="color-picker" value="#007FA1" />
-		</span>
+		<div>
+			<span>
+				<!-- 팔레트 -->
+				<input id="color-picker" value="#007FA1" />
+			</span>
+		</div>
 
 		<script>
 			// 함수
@@ -142,13 +156,11 @@
 				keys[e.keyCode] = true;
 				// Ctrl + Z
 				if (keys[17] && keys[90]) {
-					console.log("key press");
 					document.getElementById("undo").click();
 				}
 			}
 			function keysReleased(e) {
 				keys[e.keyCode] = false;
-				console.log("key releas");
 			}
 
 			//변수
@@ -164,6 +176,22 @@
 			let history = [];
 			let keys = [];
 
+			//스티커 img 요소 추가하는 for문
+			const sticker_container = document.getElementById("sticker_container");
+			for (let i = 1; i < 7; i++) {
+				// Image 객체 생성
+				const img = new Image();
+				// src 속성에 파일 주소 지정
+				img.value = "img" + i;
+				img.id = "img" + i;
+				let src = "/photo/img/sticker/img" + i + ".png";
+				img.src = src;
+				img.currentTarget.innerHTML = 'onclick="addImg()"';
+				console.log(img.src);
+				// 요소에 삽입
+				sticker_container.appendChild(img);
+				img.style = "height: 100%; object-fit: cover";
+			}
 			//캔버스
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
@@ -220,12 +248,12 @@
 						drawingControl = false; //pen 비활성화
 						event.currentTarget.value = "select";
 						event.currentTarget.innerHTML =
-							'State: <img id="mode" src="photo/img/select.png" style="width: 20px" />';
+							'State: <img id="mode" src="photo/img/icon/select.png" style="width: 20px" />';
 					} else {
 						drawingControl = true; //pen 활성화
 						event.currentTarget.value = "pen";
 						event.currentTarget.innerHTML =
-							'State: <img id="mode" src="photo/img/pen.png" style="width: 20px" />';
+							'State: <img id="mode" src="photo/img/icon/pen.png" style="width: 20px" />';
 					}
 					canvas.isDrawingMode = drawingControl;
 				});
@@ -273,51 +301,49 @@
 						};
 					});
 
+				//addImg 함수
+				function addImg(e) {
+					let selectedValue = ""; // 선택된 값을 저장할 변수
+					selectedValue = e.value;
+					let imageUrl = e.src;
+					console.log(imageUrl);
+					if (imageUrl) {
+						let stickerImg = new Image(); // const 또는 let으로 한 번만 선언
+						stickerImg.onload = function () {
+							const sticker = new fabric.Image(stickerImg);
+							canvas.add(sticker);
+						};
+						stickerImg.src = imageUrl;
+					}
+				}
 				//스티커추가 이벤트 리스너
-				const stickerImg = new Image(); // const 또는 let으로 한 번만 선언
-				let selectedValue = ""; // 선택된 값을 저장할 변수
+				// var stickerImg = new Image();
+				// document.getElementById("sticker_container").addEventListener("click", () => {
+				// 	stickerImg.onload = function (img) {
+				// 		var sticker = new fabric.Image(stickerImg);
+				// 		canvas.add(sticker);
+				// 	};
+				// 	stickerImg.src =
+				// 		"https://item.kakaocdn.net/do/7678ffa4ee52772236aa5e5d6e16b0acf43ad912ad8dd55b04db6a64cddaf76d";
+				// });
 
-				document
-					.getElementById("sticker")
-					.addEventListener("change", function () {
-						selectedValue = this.value;
-					});
-
-				document
-					.getElementById("loadSticker")
-					.addEventListener("click", function () {
-						let imageUrl = "";
-						switch (selectedValue) {
-							case "img1":
-								imageUrl =
-									"https://item.kakaocdn.net/do/219c98bd9daa7c1d0dd19a2d840b3d4ff604e7b0e6900f9ac53a43965300eb9a";
-								break;
-							case "img2":
-								imageUrl = "https://example.com/path/to/image2.png";
-								break;
-							case "img3":
-								imageUrl = "https://example.com/path/to/image3.png";
-								break;
-							case "img4":
-								imageUrl = "https://example.com/path/to/image4.png";
-								break;
-							case "img5":
-								imageUrl = "https://example.com/path/to/image5.png";
-								break;
-							case "img6":
-								imageUrl = "https://example.com/path/to/image6.png";
-								break;
-							default:
-								imageUrl = "";
-						}
-						if (imageUrl) {
-							stickerImg.onload = function () {
-								const sticker = new fabric.Image(stickerImg);
-								canvas.add(sticker);
-							};
-							stickerImg.src = imageUrl;
-						}
-					});
+				// //스티커추가 이벤트 리스너
+				// let selectedValue = ""; // 선택된 값을 저장할 변수
+				// document
+				// 	.getElementById("sticker_container")
+				// 	.addEventListener("click", function () {
+				// 		selectedValue = this.value;
+				// 		let imageUrl = this.src;
+				// 		console.log(imageUrl);
+				// 		if (imageUrl) {
+				// 			let stickerImg = new Image(); // const 또는 let으로 한 번만 선언
+				// 			stickerImg.onload = function () {
+				// 				const sticker = new fabric.Image(stickerImg);
+				// 				canvas.add(sticker);
+				// 			};
+				// 			stickerImg.src = imageUrl;
+				// 		}
+				// 	});
 
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
