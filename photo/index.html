@@ -76,15 +76,15 @@
 			<span id="brush_size_value">5</span>px
 			<!-- 미니팔레트\ > . < / -->
 			<span style="margin-left: 15px">
-				<button id="black" class="color_button"></button>
-				<button id="blue" class="color_button"></button>
-				<button id="red" class="color_button"></button>
-				<button id="green" class="color_button"></button>
+				<button id="#E1B1CA" class="color_button"></button>
+				<button id="#B19DC9" class="color_button"></button>
+				<button id="#6F8EBE" class="color_button"></button>
+				<button id="#007FA1" class="color_button"></button>
 			</span>
 		</div>
 		<span>
 			<!-- 팔레트 -->
-			<input id="color-picker" value="#00000" />
+			<input id="color-picker" value="#007FA1" />
 		</span>
 
 		<script>
@@ -151,7 +151,7 @@
 
 				// 기본 그리기 브러시 너비와 색상 설정.
 				canvas.freeDrawingBrush.width = 5;
-				canvas.freeDrawingBrush.color = "black";
+				canvas.freeDrawingBrush.color = "#007FA1";
 
 				//브러시 크기 변경.
 				document
@@ -181,10 +181,10 @@
 				});
 
 				// 미니 팔레트 클릭에 대한 이벤트 리스너
-				setupColorButtonListener("black", canvas);
-				setupColorButtonListener("blue", canvas);
-				setupColorButtonListener("red", canvas);
-				setupColorButtonListener("green", canvas);
+				setupColorButtonListener("#E1B1CA", canvas);
+				setupColorButtonListener("#B19DC9", canvas);
+				setupColorButtonListener("#6F8EBE", canvas);
+				setupColorButtonListener("#007FA1", canvas);
 
 				//"photoMode" 변경 이벤트 리스터
 				let modeButton = document.getElementById("photoMode"); //photoMode 버튼 찾아서 할당함.
