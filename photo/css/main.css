@@ -34,9 +34,9 @@ input[type="number"]:hover {
 }
 
 .color_button {
-	width: 32px;
-	height: 32px;
-	margin: 0 3px;
+	width: 31px;
+	height: 31px;
+	margin: 2px 0px;
 	border-radius: 10px;
 }
 #color-picker {
@@ -51,8 +51,3 @@ input[type="number"]:hover {
 	margin-right: 10px;
 	background-color: white;
 }
-/* .color_button {
-	width: 30px;
-	height: 30px;
-	border: solid 1px;
-} */
