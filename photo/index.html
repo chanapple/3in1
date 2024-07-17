@@ -51,7 +51,17 @@
 		</div>
 		<div style="margin: 5px">
 			<!-- 스티커 불러오기 버튼 -->
-			<button id="sticker">스티커</button>
+
+			<select name="photosticker" id="sticker">
+				<option value="img1">스티커 1</option>
+				<option value="img2">스티커 2</option>
+				<option value="img3">스티커 3</option>
+				<option value="img4">스티커 4</option>
+				<option value="img5">스티커 5</option>
+				<option value="img6">스티커 6</option>
+				<option value="img7">스티커 7</option>
+			</select>
+
 			<!-- 실행취소 -->
 			<button id="undo">
 				<img src="photo/img/undo.png" style="width: 20px" />
@@ -88,8 +98,8 @@
 		</span>
 
 		<script>
-			// 함수
 			//미니 팔레트 함수 정의
+			// 함수
 			function setupColorButtonListener(buttonId, canvas) {
 				//미니 팔레트 버튼 클릭 시 brush_color 변경.
 				document.getElementById(buttonId).addEventListener("click", () => {
@@ -110,7 +120,6 @@
 				button.style.backgroundColor = button.id;
 				button.value = button.id;
 			});
-
 			//저장 함수 정의
 			function handleSaveClick() {
 				const image = canvas.toDataURL("image/png");
@@ -119,12 +128,10 @@
 				link.download = "PaintJS[EXPORT]";
 				link.click();
 			}
-
 			//상태 기록 함수
 			function saveHistory(state) {
 				history.push(state);
 			}
-
 			//변수
 			//초기화 제어 변수
 			let clearControl = false;
@@ -136,7 +143,6 @@
 			let brush_size;
 			//상태 기록 저장
 			let history = [];
-
 			//캔버스
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
@@ -145,14 +151,11 @@
 					isDrawingMode: drawingControl, // 그리기 모드 활성화
 					backgroundColor: canvasBackgroundColor // 캔버스 배경색을 흰색으로 설정
 				});
-
 				// freeDrawingBrush가 undefined라서 PencilBrush를 수동으로 설정함.
 				canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-
 				// 기본 그리기 브러시 너비와 색상 설정.
 				canvas.freeDrawingBrush.width = 5;
 				canvas.freeDrawingBrush.color = "black";
-
 				//브러시 크기 변경.
 				document
 					.getElementById("brush_size")
@@ -161,7 +164,6 @@
 						canvas.freeDrawingBrush.width = brush_size;
 						console.log(brush_size);
 					});
-
 				// 팔레트 설정
 				$("#color-picker").spectrum({
 					type: "component",
@@ -171,19 +173,16 @@
 					showInput: true,
 					showInitial: true
 				});
-
 				//팔레트 색상 변경 시 브러시 색상 동일하게 변경.
 				$("#color-picker").on("move.spectrum", function (e, tinycolor) {
 					brush_color = "#" + tinycolor.toHex();
 					canvas.freeDrawingBrush.color = brush_color;
 				});
-
 				// 미니 팔레트 클릭에 대한 이벤트 리스너
 				setupColorButtonListener("black", canvas);
 				setupColorButtonListener("blue", canvas);
 				setupColorButtonListener("red", canvas);
 				setupColorButtonListener("green", canvas);
-
 				//"photoMode" 변경 이벤트 리스터
 				let modeButton = document.getElementById("photoMode"); //photoMode 버튼 찾아서 할당함.
 				modeButton.addEventListener("click", event => {
@@ -201,7 +200,6 @@
 					}
 					canvas.isDrawingMode = drawingControl;
 				});
-
 				//"파일 업로드"
 				document
 					.getElementById("photofile")
@@ -220,7 +218,6 @@
 							let screenWidth = window.innerWidth - 10; //윈도우 화면 가로 크기
 							let screenHeight = window.innerHeight - 10; //윈도우 화면 세로 크기
 							let ratio = 1; //비율 저장 변수(크지 않으면 원본으로 나옴.)
-
 							//이미지가 윈도우 화면 크기 보다 크다면
 							if (imgWidth > screenWidth || imgHeight > screenHeight) {
 								//윈도우 크기에 맞게 축소할 이미지 비율 구하기
@@ -251,29 +248,63 @@
 						// modeButton.textContent = "State: Select";
 						// canvas.isDrawingMode = drawingControl;
 					});
-
 				//스티커추가 이벤트 리스너
-				var stickerImg = new Image();
-				document.getElementById("sticker").addEventListener("click", () => {
-					stickerImg.onload = function (img) {
-						var sticker = new fabric.Image(stickerImg);
-						canvas.add(sticker);
-					};
-					stickerImg.src =
-						"https://item.kakaocdn.net/do/7678ffa4ee52772236aa5e5d6e16b0acf43ad912ad8dd55b04db6a64cddaf76d";
-					// // 펜 모드 비활성화하고 선택 모드로 전환
-					// drawingControl = false;
-					// modeButton.value = "select";
-					// modeButton.textContent = "State: Select";
-					// canvas.isDrawingMode = drawingControl;
-				});
 
+				const stickerImg = new Image(); // const 또는 let으로 한 번만 선언
+				let selectedValue = ""; // 선택된 값을 저장할 변수
+
+				document
+					.getElementById("sticker")
+					.addEventListener("change", function () {
+						selectedValue = this.value;
+					});
+
+				document
+					.getElementById("loadSticker")
+					.addEventListener("click", function () {
+						let imageUrl = "";
+						switch (selectedValue) {
+							case "img1":
+								imageUrl =
+									"https://item.kakaocdn.net/do/219c98bd9daa7c1d0dd19a2d840b3d4ff604e7b0e6900f9ac53a43965300eb9a";
+								break;
+							case "img2":
+								imageUrl = "https://example.com/path/to/image2.png";
+								break;
+							case "img3":
+								imageUrl = "https://example.com/path/to/image3.png";
+								break;
+							case "img4":
+								imageUrl = "https://example.com/path/to/image4.png";
+								break;
+							case "img5":
+								imageUrl = "https://example.com/path/to/image5.png";
+								break;
+							case "img6":
+								imageUrl = "https://example.com/path/to/image6.png";
+								break;
+							default:
+								imageUrl = "";
+						}
+						if (imageUrl) {
+							stickerImg.onload = function () {
+								const sticker = new fabric.Image(stickerImg);
+								canvas.add(sticker);
+							};
+							stickerImg.src = imageUrl;
+						}
+
+						// // 펜 모드 비활성화하고 선택 모드로 전환
+						// drawingControl = false;
+						// modeButton.value = "select";
+						// modeButton.textContent = "State: Select";
+						// canvas.isDrawingMode = drawingControl;
+					});
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
 				if (saveBtn) {
 					saveBtn.addEventListener("click", handleSaveClick);
 				}
-
 				//"실행 취소"에 대한 이벤트 리스너
 				document.getElementById("undo").addEventListener("click", () => {
 					if (history.length > 0) {
@@ -286,29 +317,23 @@
 					console.log(history);
 					console.log(canvas._objects);
 				});
-
 				// "지우개" 버튼 클릭에 대한 이벤트 리스너
 				// document.getElementById("erase").addEventListener("click", () => {
 				// 	canvas.freeDrawingBrush.color = canvasBackgroundColor; // 색상을 캔버스 배경색으로 설정
 				// });
-
 				canvas.on("object:added", saveHistory);
 				canvas.on("object:modified", saveHistory);
 				canvas.on("object:removed", saveHistory);
-
 				//캔버스 초기화
 				document.getElementById("clearCanvas").addEventListener("click", () => {
 					canvas.clear(); // 캔버스 초기화
 					canvas.backgroundColor = canvasBackgroundColor; // 배경색 다시 설정
 					canvas.renderAll(); // 캔버스 다시 렌더링
-
 					// freeDrawingBrush 수동 설정.
 					canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-
 					//brush_color 재설정.
 					canvas.freeDrawingBrush.color =
 						document.getElementById("color-picker").value;
-
 					//brush_size 재설정.
 					canvas.freeDrawingBrush.width = parseInt(
 						document.getElementById("brush_size").value,
