@@ -334,7 +334,7 @@
 
         // 지우개 버튼 클릭 시
         document.getElementById('eraseButton').addEventListener('click', function() {
-            context.strokeStyle = "white"; 
+            context.globalCompositeOperation = 'destination-out'; // 지우개 
             document.getElementById('stopDrawButton').style.display = 'none';
             document.getElementById('drawButton').style.display = 'inline-block';
             document.getElementById('highlighterBtn').style.display = 'inline-block';
