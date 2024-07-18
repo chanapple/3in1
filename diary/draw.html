@@ -114,7 +114,6 @@
                             newImageObj.style.cursor = 'grab';
                             document.body.appendChild(newImageObj);
                             
-
                             // 크기 조절 핸들 추가
                             const resizeHandle = document.createElement('div');
                             resizeHandle.classList.add('resize-handle');
@@ -148,6 +147,7 @@
                                 if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
                                     resizeHandle.style.display = 'none';
                                 }
+                                
                             });
                         };
                         reader.readAsDataURL(file);
@@ -251,15 +251,18 @@
 
             document.getElementById('imageBtn').addEventListener('click', function() {
                 const fileInput = document.getElementById('file-input');
-
                 const drawButton = document.getElementById('drawButton');
-
+                
                 if (stopDrawButton.style.display !== 'none') {
                     stopDrawButton.style.display = 'none';
                     drawButton.style.display = 'inline-block';
                 }
                 
                 fileInput.style.display = fileInput.style.display === 'none' ? 'block' : 'none';
+                canvas.style.zIndex = 2;
+                canvas.removeEventListener('mousedown', startDrawing);
+                canvas.removeEventListener('mousemove', draw);
+                canvas.removeEventListener('mouseup', stopDrawing);
             });
             
          </script>
@@ -392,6 +395,7 @@
             canvas.addEventListener('mouseup', stopDrawing);
             isHighlighterMode = false; // 형광펜 모드 해제
             context.globalCompositeOperation = 'source-over';
+            canvas.style.zIndex = 3;
         });
 
         // 그리기 정지 버튼 클릭 시
@@ -403,6 +407,7 @@
             canvas.removeEventListener('mouseup', stopDrawing);
             isDrawing = false;
             context.globalAlpha = 1; // 그리기가 정지되면 불투명도를 원래대로 설정
+            canvas.style.zIndex = 3;
         });
 
         // 형광펜 버튼 클릭 시
@@ -418,6 +423,7 @@
             canvas.addEventListener('mouseup', stopDrawing);
             isHighlighterMode = true; // 형광펜 모드 활성화
             context.globalCompositeOperation = 'source-over';
+            canvas.style.zIndex = 3;
         });
 
         // 형광펜 정지 버튼 클릭 시 
@@ -428,6 +434,7 @@
             canvas.removeEventListener('mousemove', draw);
             canvas.removeEventListener('mouseup', stopDrawing);
             isHighlighterMode = false; // 형광펜 모드 활성화
+            canvas.style.zIndex = 3;
         });
 
         // 색 변경 기능
