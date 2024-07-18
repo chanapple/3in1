@@ -55,32 +55,15 @@
 		<div
 			id="sticker_container"
 			style="
-				width: 80%;
+				width: 50%;
 				height: 70px;
 				overflow-x: auto;
 				white-space: nowrap;
 				scrollbar-width: thin;
 				scrollbar-color: gray;
 			"
-		>
-			<!-- <img
-				value="img1"
-				src="https://item.kakaocdn.net/do/219c98bd9daa7c1d0dd19a2d840b3d4ff604e7b0e6900f9ac53a43965300eb9a"
-				style="width: 100%; height: 100%; display: inline; object-fit: cover"
-			/> -->
-		</div>
+		></div>
 		<div style="margin: 5px">
-			<!-- <select name="photosticker" id="sticker">
-				<option value="img0">스티커</option>
-				<option value="img1">스티커 1</option>
-				<option value="img2">스티커 2</option>
-				<option value="img3">스티커 3</option>
-				<option value="img4">스티커 4</option>
-				<option value="img5">스티커 5</option>
-				<option value="img6">스티커 6</option>
-				<option value="img7">스티커 7</option>
-			</select> -->
-
 			<!-- 브러시 크기 -->
 			<label for="brush_size"
 				><img src="photo/img/icon/pen.png" style="width: 20px"
@@ -176,22 +159,6 @@
 			let history = [];
 			let keys = [];
 
-			//스티커 img 요소 추가하는 for문
-			const sticker_container = document.getElementById("sticker_container");
-			for (let i = 1; i < 7; i++) {
-				// Image 객체 생성
-				const img = new Image();
-				// src 속성에 파일 주소 지정
-				img.value = "img" + i;
-				img.id = "img" + i;
-				let src = "/photo/img/sticker/img" + i + ".png";
-				img.src = src;
-				img.currentTarget.innerHTML = 'onclick="addImg()"';
-				console.log(img.src);
-				// 요소에 삽입
-				sticker_container.appendChild(img);
-				img.style = "height: 100%; object-fit: cover";
-			}
 			//캔버스
 			// HTML 문서가 완전히 로드될 때까지 기다린 후 코드를 실행
 			document.addEventListener("DOMContentLoaded", function () {
@@ -216,7 +183,6 @@
 						brushSizeValue.textContent = event.target.value;
 						brush_size = parseInt(event.target.value, 10);
 						canvas.freeDrawingBrush.width = brush_size;
-						console.log(brush_size);
 					});
 
 				// 팔레트 설정
@@ -257,6 +223,7 @@
 					}
 					canvas.isDrawingMode = drawingControl;
 				});
+
 				//"파일 업로드"
 				document
 					.getElementById("photofile")
@@ -264,7 +231,6 @@
 						//로컬 파일의 url 읽어오기
 						const file = event.target.files[0];
 						const url = URL.createObjectURL(file);
-						console.log(url);
 						//이미지로 불러오기
 						var newImage = new Image();
 						newImage.src = url;
@@ -301,12 +267,28 @@
 						};
 					});
 
+				//스티커 img 요소 추가하는 for문
+				const sticker_container = document.getElementById("sticker_container");
+				for (let i = 1; i < 7; i++) {
+					// Image 객체 생성
+					const img = new Image();
+					// src 속성에 파일 주소 지정
+					img.value = "img" + i;
+					img.id = "img" + i;
+					let src = "/photo/img/sticker/img" + i + ".png";
+					img.src = src;
+					img.onclick = function () {
+						addImg(img.value);
+					};
+					// 요소에 삽입
+					sticker_container.appendChild(img);
+					img.style = "height: 100%; object-fit: cover";
+				}
+
 				//addImg 함수
-				function addImg(e) {
-					let selectedValue = ""; // 선택된 값을 저장할 변수
-					selectedValue = e.value;
-					let imageUrl = e.src;
-					console.log(imageUrl);
+				function addImg(imgValue) {
+					let targetImg = document.getElementById(imgValue);
+					let imageUrl = targetImg.src;
 					if (imageUrl) {
 						let stickerImg = new Image(); // const 또는 let으로 한 번만 선언
 						stickerImg.onload = function () {
@@ -316,34 +298,6 @@
 						stickerImg.src = imageUrl;
 					}
 				}
-				//스티커추가 이벤트 리스너
-				// var stickerImg = new Image();
-				// document.getElementById("sticker_container").addEventListener("click", () => {
-				// 	stickerImg.onload = function (img) {
-				// 		var sticker = new fabric.Image(stickerImg);
-				// 		canvas.add(sticker);
-				// 	};
-				// 	stickerImg.src =
-				// 		"https://item.kakaocdn.net/do/7678ffa4ee52772236aa5e5d6e16b0acf43ad912ad8dd55b04db6a64cddaf76d";
-				// });
-
-				// //스티커추가 이벤트 리스너
-				// let selectedValue = ""; // 선택된 값을 저장할 변수
-				// document
-				// 	.getElementById("sticker_container")
-				// 	.addEventListener("click", function () {
-				// 		selectedValue = this.value;
-				// 		let imageUrl = this.src;
-				// 		console.log(imageUrl);
-				// 		if (imageUrl) {
-				// 			let stickerImg = new Image(); // const 또는 let으로 한 번만 선언
-				// 			stickerImg.onload = function () {
-				// 				const sticker = new fabric.Image(stickerImg);
-				// 				canvas.add(sticker);
-				// 			};
-				// 			stickerImg.src = imageUrl;
-				// 		}
-				// 	});
 
 				// "저장" 버튼 클릭에 대한 이벤트 리스너
 				const saveBtn = document.getElementById("photoSave");
@@ -360,8 +314,6 @@
 						canvas._objects.pop();
 					}
 					canvas.renderAll();
-					console.log(history);
-					console.log(canvas._objects);
 				});
 
 				//history 배열에 저장.
