@@ -17,17 +17,26 @@
             var calendarEl = document.getElementById('calendar'); 
             var calendar = new FullCalendar.Calendar(calendarEl, { //full-calendar 생성
                 height: '670px',    //높이 조절
-                expandRows: true,   //
+                expandRows: true,   //화면에 맞게 높이 설정
+                customButtons:{
+                    myCustomButton:{
+                        text:"add",
+                        click:function(){
+                            $("#exampleModal").modal("show");
+                        }
+                    }
+                },
                 headerToolbar: {    // 달력 헤더
                     left: 'prev,next',      //전달,다음달    
                     center: 'title',          //2024년 07월
-                    right: 'today'        //오늘로 바로가기
+                    right: 'today,myCustomButton'        //오늘로 바로가기
                 },
                 initialView: 'dayGridMonth', // 첫화면을 달력으로
                 editable: true, // 수정 가능
                 selectable: true, // 달력 일자 드래그 설정가능
                 displayEventTime: false, // 시간 표시 안함
                 fixedWeekCount: false, // 막주에 맞춰 칸 조정
+                
                 dayMaxEvents: true, // 이벤트 오버 높이 제한 (+2)
                 eventAdd: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
                     console.log(obj);
@@ -62,6 +71,7 @@
                 events: [ // 일정 데이터 추가 , DB의 event를 가져오려면 JSON 형식으로 변환해 events에 넣어주면된다.
                     {
                         title:'MT',
+                        backgroundColor:'#',
                         start:'2024-07-20 00:00:00',
                         end:'2024-07-22 24:00:00'
                     }
@@ -106,5 +116,53 @@
     <div id="calendarBox">
         <div id="calendar"></div>
     </div>
+    <div
+    class="modal fade"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">일정 추가하기</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          일정이름 : <input type="text" id="title" /><br />
+          시작시간 : <input type="datetime-local" id="start" /><br />
+          종료시간 : <input type="datetime-local" id="end" /><br />
+          배경색상 :
+          <select id="color">
+            <option value="red">빨강색</option>
+            <option value="orange">주황색</option>
+            <option value="yellow">노랑색</option>
+            <option value="green">초록색</option>
+            <option value="blue">파랑색</option>
+            <option value="indigo">남색</option>
+            <option value="purple">보라색</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            취소
+          </button>
+          <button type="button" class="btn btn-primary" id="saveChanges">
+            추가
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
