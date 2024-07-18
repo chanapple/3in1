@@ -267,7 +267,7 @@
             
          </script>
 
-        <div class="toolbar" style="position: absolute; z-index: 3;">
+        <div class="toolbar" style="position: absolute; z-index: 4;">
             <input id="color" type="color">
             <br>
             <label for="slider">PX</label>
@@ -444,9 +444,23 @@
         
         color.addEventListener("change", oncolorChange);
 
-        // 로컬스토리지에 캔버스 저장하는 기능 
+        // 저장 버튼 클릭 시 
+        document.getElementById('saveButton').addEventListener('click', saveCanvasData);
+
+         // 로컬스토리지에 캔버스 데이터 저장하는 기능 
         function saveCanvasData() {
+            // 캔버스 그림 저장
             localStorage.setItem('canvasImage', canvas.toDataURL());
+
+            // 추가된 이미지 저장
+            const addedImages = document.querySelectorAll('img');
+            let imageArray = [];
+            addedImages.forEach(image => {
+                if (image.src.startsWith('data:image')) {
+                    imageArray.push(image.src);
+                }
+            });
+            localStorage.setItem('addedImages', JSON.stringify(imageArray));
 
             localStorage.setItem('lineWidth', lineWidth);
             localStorage.setItem('color', color.value);
@@ -454,9 +468,6 @@
             // 저장 잘 됐는지 확인용 
             alert('캔버스 데이터 저장 성공');
         }
-
-        // 저장 버튼 클릭 시 
-        document.getElementById('saveButton').addEventListener('click', saveCanvasData);
 
         // 로컬스토리지로부터 저장된 캔버스 데이터 불러오는 기능
         function loadCanvasData() {
@@ -468,6 +479,56 @@
                     context.drawImage(img, 0, 0);
                 };
                 img.src = savedImage;
+            }
+
+            const savedImages = localStorage.getItem('addedImages');
+            if (savedImages) {
+                const imageArray = JSON.parse(savedImages);
+                imageArray.forEach(src => {
+                    const newImageObj = document.createElement('img');
+                    newImageObj.src = src;
+                    newImageObj.style.position = 'absolute';
+                    newImageObj.style.zIndex = 2;
+                    newImageObj.style.cursor = 'grab';
+
+                    
+                    document.body.appendChild(newImageObj);
+                    
+                    // 크기 조절 핸들 추가
+                    const resizeHandle = document.createElement('div');
+                    resizeHandle.classList.add('resize-handle');
+                    document.body.appendChild(resizeHandle);
+
+                    // 초기 크기 조절 핸들 위치 설정
+                    updateResizeHandlePosition(newImageObj, resizeHandle);
+
+                    // 이미지 이동 
+                    newImageObj.addEventListener('mousedown', dragStart);
+                    document.addEventListener('mouseup', dragEnd);
+                    document.addEventListener('mousemove', drag);
+
+                    // 이미지 크기 조절
+                    resizeHandle.addEventListener('mousedown', resizeStart);
+                    document.addEventListener('mousemove', resize);
+                    document.addEventListener('mouseup', resizeEnd);
+
+                    newImageObj.addEventListener('mouseenter', function(e) {
+                        const stopDrawButton = document.getElementById('stopDrawButton');
+                        if (stopDrawButton.style.display === 'none') {
+                            newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
+                        }
+                    });
+
+                    newImageObj.addEventListener('click', function() {
+                        resizeHandle.style.display = 'block';
+                    });
+
+                    document.addEventListener('click', function(e) {
+                        if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
+                            resizeHandle.style.display = 'none';
+                        }
+                    });
+                });
             }
 
             const savedLineWidth = localStorage.getItem('lineWidth');
@@ -482,12 +543,9 @@
                 color.value = savedColor;
                 context.strokeStyle = savedColor;
             }
-            
         }
 
         window.addEventListener('load', loadCanvasData);
-
-
     </script>
   
     
