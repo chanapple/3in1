@@ -159,8 +159,8 @@
             let img, resizeHandle, startWidth, startHeight, startMouseX, startMouseY;
 
             function updateResizeHandlePosition(imageObj, handle) {
-                handle.style.left = `${imageObj.offsetLeft + imageObj.clientWidth - 5}px`;
-                handle.style.top = `${imageObj.offsetTop + imageObj.clientHeight - 5}px`;
+                handle.style.left = (imageObj.offsetLeft + imageObj.clientWidth - 5) + 'px';
+                handle.style.top = (imageObj.offsetTop + imageObj.clientHeight - 5) + 'px';
             }
 
             function resizeStart(e) {
