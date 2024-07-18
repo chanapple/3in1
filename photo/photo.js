@@ -13,6 +13,7 @@ const router = express.Router();
 router.get("/", controller.viewIndex);
 router.use("/css", express.static(path.join(__dirname, "/photo/css")));
 router.use("/img", express.static(path.join(__dirname, "/photo/img")));
+router.use("/js", express.static(path.join(__dirname, "/photo/js")));
 
 /** 모듈 내보내기 */
 export default router;
