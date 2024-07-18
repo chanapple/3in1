@@ -4,9 +4,11 @@
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">  
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css' rel='stylesheet'>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/locales-all.min.js'></script>
+    
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
 
@@ -36,7 +38,7 @@
                 eventRemove: function(obj) { // 이벤트가 제거되면 발생하는 이벤트
                     console.log(obj);
                 },
-                eventDidMount: function(info) {
+                eventDidMount: function(info) { 
                     tippy(info.el, {
                         content: info.event._def.title,
                         placement: "bottom",
@@ -44,7 +46,7 @@
                         interactive: true,
                     })
                 },
-                select: function(arg) { // 캘린더에서 드래그로 이벤트를 생성할 수 있다.
+                select: function(arg) { // 캘린더에서 드래그로 이벤트를 생성
                     var title = prompt('Event Title:');
                     if (title) {
                             calendar.addEvent({
@@ -75,26 +77,26 @@
         padding-right: 2em;
         font-size: 14px;
     }
-    .fc-header-toolbar {
+    .fc-header-toolbar {    /*2024년 어쩌구 위에 간격*/
         padding-top: 2em;
     }
-    .fc-day-sun a {
+    .fc-day-sun a {     /*일요일*/
         color: red;
         text-decoration: none;
     }
-    .fc-day-sat a {
+    .fc-day-sat a {     /*토요일*/
         color: blue;
         text-decoration: none;
     }
-    .fc-prev-button.fc-button.fc-button-primary {
+    .fc-prev-button.fc-button.fc-button-primary {   /*이전달 버튼 색상*/ 
         background: white;
         color: black;
     }
-    .fc-next-button.fc-button.fc-button-primary {
+    .fc-next-button.fc-button.fc-button-primary {   /*다음달 버튼 색상*/
         background: white;
         color: black;
     }
-    .fc-today-button.fc-button.fc-button-primary {
+    .fc-today-button.fc-button.fc-button-primary {  /*today 버튼 색상*/
         background: white;
         color: black;
     }
