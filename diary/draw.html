@@ -181,6 +181,10 @@
                     img.style.width = `${newWidth}px`;
                     img.style.height = `${newHeight}px`;
                     updateResizeHandlePosition(img, resizeHandle);
+
+                    // 크기 조정 후 위치 저장
+                    localStorage.setItem('lastImgWidth', img.style.width);
+                    localStorage.setItem('lastImgHeight', img.style.height);
                 }
             }
 
@@ -221,6 +225,10 @@
                     const imageObj = document.querySelector('img[style*="grabbing"]');
                     if (imageObj) {
                         imageObj.style.cursor = 'grab';
+                         // 최종 위치 저장
+                        localStorage.setItem('lastImgLeft', imageObj.style.left);
+                        localStorage.setItem('lastImgTop', imageObj.style.top);
+
                         const resizeHandle = imageObj.nextElementSibling;
                         updateResizeHandlePosition(imageObj, resizeHandle);
                         resizeHandle.style.display = 'none'; // 드래그가 끝나면 핸들을 숨김
@@ -455,9 +463,15 @@
             // 추가된 이미지 저장
             const addedImages = document.querySelectorAll('img');
             let imageArray = [];
-            addedImages.forEach(image => {
+            addedImages.forEach((image, index) => {
                 if (image.src.startsWith('data:image')) {
-                    imageArray.push(image.src);
+                    const imageId = `image_${index}`; // 각 이미지를 식별할 고유한 식별자
+                    localStorage.setItem(`${imageId}_src`, image.src);
+                    localStorage.setItem(`${imageId}_left`, image.style.left);
+                    localStorage.setItem(`${imageId}_top`, image.style.top);
+                    localStorage.setItem(`${imageId}_width`, image.style.width);
+                    localStorage.setItem(`${imageId}_height`, image.style.height);
+                    imageArray.push(imageId);
                 }
             });
             localStorage.setItem('addedImages', JSON.stringify(imageArray));
@@ -484,50 +498,57 @@
             const savedImages = localStorage.getItem('addedImages');
             if (savedImages) {
                 const imageArray = JSON.parse(savedImages);
-                imageArray.forEach(src => {
-                    const newImageObj = document.createElement('img');
-                    newImageObj.src = src;
-                    newImageObj.style.position = 'absolute';
-                    newImageObj.style.zIndex = 2;
-                    newImageObj.style.cursor = 'grab';
+                imageArray.forEach(imageId => {
+                    const src = localStorage.getItem(`${imageId}_src`);
+                    const left = localStorage.getItem(`${imageId}_left`);
+                    const top = localStorage.getItem(`${imageId}_top`);
+                    const width = localStorage.getItem(`${imageId}_width`);
+                    const height = localStorage.getItem(`${imageId}_height`);
 
-                    
-                    document.body.appendChild(newImageObj);
-                    
-                    // 크기 조절 핸들 추가
-                    const resizeHandle = document.createElement('div');
-                    resizeHandle.classList.add('resize-handle');
-                    document.body.appendChild(resizeHandle);
+                    if (src && left && top && width && height) {
+                        const newImageObj = document.createElement('img');
+                        newImageObj.src = src;
+                        newImageObj.style.position = 'absolute';
+                        newImageObj.style.zIndex = 2;
+                        newImageObj.style.cursor = 'grab';
+                        newImageObj.style.left = left;
+                        newImageObj.style.top = top;
+                        newImageObj.style.width = width;
+                        newImageObj.style.height = height;
 
-                    // 초기 크기 조절 핸들 위치 설정
-                    updateResizeHandlePosition(newImageObj, resizeHandle);
+                        document.body.appendChild(newImageObj);
 
-                    // 이미지 이동 
-                    newImageObj.addEventListener('mousedown', dragStart);
-                    document.addEventListener('mouseup', dragEnd);
-                    document.addEventListener('mousemove', drag);
+                        const resizeHandle = document.createElement('div');
+                        resizeHandle.classList.add('resize-handle');
+                        document.body.appendChild(resizeHandle);
 
-                    // 이미지 크기 조절
-                    resizeHandle.addEventListener('mousedown', resizeStart);
-                    document.addEventListener('mousemove', resize);
-                    document.addEventListener('mouseup', resizeEnd);
+                        updateResizeHandlePosition(newImageObj, resizeHandle);
 
-                    newImageObj.addEventListener('mouseenter', function(e) {
-                        const stopDrawButton = document.getElementById('stopDrawButton');
-                        if (stopDrawButton.style.display === 'none') {
-                            newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
-                        }
-                    });
+                        newImageObj.addEventListener('mousedown', dragStart);
+                        document.addEventListener('mouseup', dragEnd);
+                        document.addEventListener('mousemove', drag);
 
-                    newImageObj.addEventListener('click', function() {
-                        resizeHandle.style.display = 'block';
-                    });
+                        resizeHandle.addEventListener('mousedown', resizeStart);
+                        document.addEventListener('mousemove', resize);
+                        document.addEventListener('mouseup', resizeEnd);
 
-                    document.addEventListener('click', function(e) {
-                        if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
-                            resizeHandle.style.display = 'none';
-                        }
-                    });
+                        newImageObj.addEventListener('mouseenter', function(e) {
+                            const stopDrawButton = document.getElementById('stopDrawButton');
+                            if (stopDrawButton.style.display === 'none') {
+                                newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
+                            }
+                        });
+
+                        newImageObj.addEventListener('click', function() {
+                            resizeHandle.style.display = 'block';
+                        });
+
+                        document.addEventListener('click', function(e) {
+                            if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
+                                resizeHandle.style.display = 'none';
+                            }
+                        });
+                    }
                 });
             }
 
