@@ -29,7 +29,7 @@
         border: none;
     }
  
-    #drawButton, #stopDrawButton {
+    #drawButton, #stopDrawButton, #eraseButton, #stopEraseButton, #highlighterBtn, #stopHighlighterBtn {
         border: 0px;
         background-color: #fff;
     }
@@ -45,27 +45,52 @@
         cursor: grab;
         display: none; /* 처음에는 이미지를 숨김 */
     }
+    
+    /* 이미지 크기 조절 핸들러 */
+    .resize-handle {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        background-color: rgb(255, 255, 255);
+        border: 1px solid #000000;
+        cursor: nwse-resize;
+        z-index: 3;
+        display: none;
+    }
+
+    
     </style>
 </head>
 <body>
     <div>
-        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-            <div style="display: flex; flex-direction: row; align-items: center;">
-                <button id="drawButton" style="display: inline-block; ">
-                    <img src="/diary/image/paint-brush-icon.png" width="30px" style="padding: 10px;">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; ">
+            <div style="display: flex; flex-direction: row; align-items: center; margin-top: 5px">
+                <button id="drawButton" style="display: inline-block; margin-right: 8px;">
+                    <img src="/diary/image/free-icon-paintbrush-2050922.png" width="30px" >
                 </button>
-                <button id="stopDrawButton" style="display: none; ">
-                    <img src="/diary/image/paint-brush-icon.png" width="30px" style="background-color: rgb(231, 231, 231); padding: 10px;">
+                <button id="stopDrawButton" style="display: none; margin-right: 8px;">
+                    <img src="/diary/image/free-icon-paintbrush-2050921.png" width="30px">
                 </button>
-                <button id="eraseButton" style="margin-right: 10px;">지우기</button>
+                <button id="highlighterBtn" style="margin-right: 10px; display: inline-block;">
+                    <img src="/diary/image/free-icon-highlighter-1827994.png" width="30px">
+                </button>
+                <button id="stopHighlighterBtn" style="margin-right: 10px; display: none;">
+                    <img src="/diary/image/free-icon-highlighter-1827980.png" width="30px">
+                </button>
+                <button id="eraseButton" style="margin-right: 10px; display: inline-block;">
+                    <img src="/diary/image/free-icon-eraser-152689.png" width="30px">
+                </button>
+                <button id="stopEraseButton" style="margin-right: 10px; display: none;">
+                    <img src="/diary/image/free-icon-eraser-153580.png" width="30px">
+                </button>
                 <button id="imageBtn" style="margin-right: 10px;">사진</button>
                 <input type="file" id="file-input" multiple>
-                
+                <button id="saveButton">Save</button>
             </div>
             
             <div style="display: flex; flex-direction: row; align-items: center; ">
                 <button class="dropdown" style="display: flex; flex-direction: row; align-items: center;">
-                    <img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 19px;">
+                    <img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 10px;">
                 </button>
             </div>
         </div>
@@ -76,28 +101,98 @@
             const fileInput = document.getElementById('file-input');
             const imageObj = document.getElementById('imgObj');
 
-            let isDragging = false;
-            let startX, startY, initialX, initialY;
-
             fileInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
+            const files = event.target.files;
+            for (let file of files) {
                 if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imageObj.src = e.target.result;
-                        imageObj.style.display = 'block'; // 이미지 로드 후 표시
-                        fileInput.style.display = 'none'; // 파일 입력 요소 숨김
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    imageObj.src = '';
-                    imageObj.style.display = 'none'; // 유효하지 않은 파일일 경우 이미지 숨김
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const newImageObj = document.createElement('img');
+                            newImageObj.src = e.target.result;
+                            newImageObj.style.position = 'absolute';
+                            newImageObj.style.zIndex = 2;
+                            newImageObj.style.cursor = 'grab';
+                            document.body.appendChild(newImageObj);
+                            
+
+                            // 크기 조절 핸들 추가
+                            const resizeHandle = document.createElement('div');
+                            resizeHandle.classList.add('resize-handle');
+                            document.body.appendChild(resizeHandle);
+
+                            // 초기 크기 조절 핸들 위치 설정
+                            updateResizeHandlePosition(newImageObj, resizeHandle);
+                            
+                            // 이미지 이동 
+                            newImageObj.addEventListener('mousedown', dragStart);
+                            document.addEventListener('mouseup', dragEnd);
+                            document.addEventListener('mousemove', drag);
+                            
+                            // 이미지 크기 조절
+                            resizeHandle.addEventListener('mousedown', resizeStart);
+                            document.addEventListener('mousemove', resize);
+                            document.addEventListener('mouseup', resizeEnd);
+
+                            newImageObj.addEventListener('mouseenter', function(e) {
+                                const stopDrawButton = document.getElementById('stopDrawButton');
+                                if (stopDrawButton.style.display === 'none') {
+                                    newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
+                                }
+                            });
+
+                            newImageObj.addEventListener('click', function() {
+                                resizeHandle.style.display = 'block';
+                            });
+
+                            document.addEventListener('click', function(e) {
+                                if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
+                                    resizeHandle.style.display = 'none';
+                                }
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 }
             });
 
-            imageObj.addEventListener('mousedown', dragStart);
-            document.addEventListener('mouseup', dragEnd);
-            document.addEventListener('mousemove', drag);
+            let isResizing = false;
+            let img, resizeHandle, startWidth, startHeight, startMouseX, startMouseY;
+
+            function updateResizeHandlePosition(imageObj, handle) {
+                handle.style.left = `${imageObj.offsetLeft + imageObj.clientWidth - 5}px`;
+                handle.style.top = `${imageObj.offsetTop + imageObj.clientHeight - 5}px`;
+            }
+
+            function resizeStart(e) {
+                isResizing = true;
+                img = e.target.previousElementSibling;
+                resizeHandle = e.target;
+                startWidth = img.clientWidth;
+                startHeight = img.clientHeight;
+                startMouseX = e.clientX;
+                startMouseY = e.clientY;
+                e.preventDefault();
+            }
+
+            function resize(e) {
+                if (isResizing) {
+                    const newWidth = startWidth + (e.clientX - startMouseX);
+                    const newHeight = startHeight + (e.clientY - startMouseY);
+                    img.style.width = `${newWidth}px`;
+                    img.style.height = `${newHeight}px`;
+                    updateResizeHandlePosition(img, resizeHandle);
+                }
+            }
+
+            function resizeEnd(e) {
+                if (isResizing) {
+                    isResizing = false;
+                    resizeHandle.style.display = 'none';
+                }
+            }
+
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
 
             function dragStart(e) {
                 const stopDrawButton = document.getElementById('stopDrawButton');
@@ -106,8 +201,9 @@
                     return;
                 }
 
-                if (e.button === 0 && e.target === imageObj) { 
+                if (e.button === 0 && e.target.tagName === 'IMG') { 
                     isDragging = true;
+                    const imageObj = e.target;
                     startX = e.clientX;
                     startY = e.clientY;
 
@@ -115,51 +211,55 @@
                     initialX = parseInt(style.left, 10) || 0;
                     initialY = parseInt(style.top, 10) || 0;
 
-                    imageObj.style.cursor = 'grabbing'; // Change cursor when dragging
+                    imageObj.style.cursor = 'grabbing';
                 }
             }
 
-            function dragEnd() {
+            function dragEnd(e) {
                 if (isDragging) {
                     isDragging = false;
-                    imageObj.style.cursor = 'grab'; // 드래그 종료 시 커서 변경
+                    const imageObj = document.querySelector('img[style*="grabbing"]');
+                    if (imageObj) {
+                        imageObj.style.cursor = 'grab';
+                        const resizeHandle = imageObj.nextElementSibling;
+                        updateResizeHandlePosition(imageObj, resizeHandle);
+                        resizeHandle.style.display = 'none'; // 드래그가 끝나면 핸들을 숨김
+                    }
                 }
             }
 
             function drag(e) {
                 if (isDragging && e.button === 0) {
                     e.preventDefault();
+                    const imageObj = document.querySelector('img[style*="grabbing"]');
 
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
+                    if (imageObj) {
+                        const dx = e.clientX - startX;
+                        const dy = e.clientY - startY;
 
-                    imageObj.style.left = `${initialX + dx}px`;
-                    imageObj.style.top = `${initialY + dy}px`;
+                        imageObj.style.left = `${initialX + dx}px`;
+                        imageObj.style.top = `${initialY + dy}px`;
+
+                        const resizeHandle = imageObj.nextElementSibling;
+                        updateResizeHandlePosition(imageObj, resizeHandle);
+                    }
                 }
             }
 
             // 초기 커서 설정
-            imageObj.style.cursor = 'grab';  
-
-             // 이미지에 마우스 진입 시 이벤트 추가
-             imageObj.addEventListener('mouseenter', function(e) {
-                const stopDrawButton = document.getElementById('stopDrawButton');
-                if (stopDrawButton.style.display !== 'none') {
-                    imageObj.style.pointerEvents = 'none'; // 마우스 이벤트 무시
-                    return;
-                }
-            });
-
             document.getElementById('file-input').style.display = 'none';
 
-            // 파일 입력 요소 토글 처리
             document.getElementById('imageBtn').addEventListener('click', function() {
                 const fileInput = document.getElementById('file-input');
-                if (fileInput.style.display === 'none') {
-                    fileInput.style.display = 'block';
-                } else {
-                    fileInput.style.display = 'none';
+
+                const drawButton = document.getElementById('drawButton');
+
+                if (stopDrawButton.style.display !== 'none') {
+                    stopDrawButton.style.display = 'none';
+                    drawButton.style.display = 'inline-block';
                 }
+                
+                fileInput.style.display = fileInput.style.display === 'none' ? 'block' : 'none';
             });
             
          </script>
@@ -181,11 +281,11 @@
                 if (status) {      
                     document.querySelector('.toolbar').classList.add('show'); 
                     const drop = document.querySelector('.dropdown');
-                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="transform: rotate(180deg); margin-left: 19px;">';     
+                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="transform: rotate(180deg); margin-left: 10px;">';     
                 } else {      
                     document.querySelector('.toolbar').classList.remove('show'); 
                     const drop = document.querySelector('.dropdown');
-                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 19px;">';  
+                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 10px;">';  
                 }    
                 status = !status;  
             }
@@ -193,6 +293,7 @@
         
         document.querySelector('.dropdown').addEventListener('click', toggleInit);
 
+      
 	</script>
 
 	<canvas id="myCanvas" style="position: absolute; z-index: 1;"></canvas>
@@ -204,7 +305,8 @@
         var lastX = 0;
         var lastY = 0;
 		let lineWidth = 10;
-
+        let isHighlighterMode = false; // 형광펜 모드인지 여부를 나타내는 플래그
+        
         context.canvas.width  = window.innerWidth;
         context.canvas.height = window.innerHeight;
 
@@ -228,6 +330,14 @@
             context.beginPath();
             context.moveTo(lastX, lastY);
             context.lineTo(event.offsetX, event.offsetY);
+            if (isHighlighterMode) {
+                // 형광펜 모드
+                context.globalAlpha = 0.5;
+                context.lineCap = 'butt';
+            } else {
+                context.globalAlpha = 1; // 일반 그리기 모드
+                context.lineCap = 'round';
+            }
 			context.lineWidth = lineWidth; 
             context.stroke();
             [lastX, lastY] = [event.offsetX, event.offsetY];
@@ -235,27 +345,53 @@
 
         function stopDrawing() {
             isDrawing = false;
+            context.globalAlpha = 1; // 그리기가 종료되면 불투명도를 원래대로 설정
         }
 
 
         // 지우개 버튼 클릭 시
         document.getElementById('eraseButton').addEventListener('click', function() {
-            context.strokeStyle = "white"; 
+            context.globalCompositeOperation = 'destination-out'; // 지우개 
+            this.style.display = 'none';
+            document.getElementById('stopEraseButton').style.display = 'inline-block';
             document.getElementById('stopDrawButton').style.display = 'none';
             document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing); 
+            isHighlighterMode = false; // 형광펜 모드 해제
+        });
+
+        // 지우개 정지 버튼 클릭 시
+        document.getElementById('stopEraseButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('eraseButton').style.display = 'inline-block';
+            document.getElementById('stopDrawButton').style.display = 'none';
+            document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing); 
+            isHighlighterMode = false; // 형광펜 모드 해제
+            context.globalCompositeOperation = 'source-over';
         });
 
         // 그리기 버튼 클릭 시
         document.getElementById('drawButton').addEventListener('click', function() {
             this.style.display = 'none';
             document.getElementById('stopDrawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
+            document.getElementById('eraseButton').style.display = 'inline-block';
+            document.getElementById('stopEraseButton').style.display = 'none';
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
-            context.strokeStyle = "black";
+            isHighlighterMode = false; // 형광펜 모드 해제
+            context.globalCompositeOperation = 'source-over';
         });
 
         // 그리기 정지 버튼 클릭 시
@@ -266,13 +402,84 @@
             canvas.removeEventListener('mousemove', draw);
             canvas.removeEventListener('mouseup', stopDrawing);
             isDrawing = false;
+            context.globalAlpha = 1; // 그리기가 정지되면 불투명도를 원래대로 설정
         });
+
+        // 형광펜 버튼 클릭 시
+        document.getElementById('highlighterBtn').addEventListener('click', function() {
+            document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('stopDrawButton').style.display = 'none';
+            document.getElementById('stopHighlighterBtn').style.display = 'inline-block';
+            document.getElementById('eraseButton').style.display = 'inline-block';
+            document.getElementById('stopEraseButton').style.display = 'none';
+            this.style.display = 'none';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            isHighlighterMode = true; // 형광펜 모드 활성화
+            context.globalCompositeOperation = 'source-over';
+        });
+
+        // 형광펜 정지 버튼 클릭 시 
+        document.getElementById('stopHighlighterBtn').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            isHighlighterMode = false; // 형광펜 모드 활성화
+        });
+
         // 색 변경 기능
         function oncolorChange(event) {
             context.strokeStyle = event.target.value;
         }
-
+        
         color.addEventListener("change", oncolorChange);
+
+        // 로컬스토리지에 캔버스 저장하는 기능 
+        function saveCanvasData() {
+            localStorage.setItem('canvasImage', canvas.toDataURL());
+
+            localStorage.setItem('lineWidth', lineWidth);
+            localStorage.setItem('color', color.value);
+
+            // 저장 잘 됐는지 확인용 
+            alert('캔버스 데이터 저장 성공');
+        }
+
+        // 저장 버튼 클릭 시 
+        document.getElementById('saveButton').addEventListener('click', saveCanvasData);
+
+        // 로컬스토리지로부터 저장된 캔버스 데이터 불러오는 기능
+        function loadCanvasData() {
+            const savedImage = localStorage.getItem('canvasImage');
+            if (savedImage) {
+                const img = new Image();
+                img.onload = function() {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0);
+                };
+                img.src = savedImage;
+            }
+
+            const savedLineWidth = localStorage.getItem('lineWidth');
+            if (savedLineWidth) {
+                lineWidth = parseInt(savedLineWidth);
+                document.getElementById('slider').value = lineWidth;
+                document.getElementById('lineWidth').innerText = String(lineWidth);
+            }
+
+            const savedColor = localStorage.getItem('color');
+            if (savedColor) {
+                color.value = savedColor;
+                context.strokeStyle = savedColor;
+            }
+            
+        }
+
+        window.addEventListener('load', loadCanvasData);
+
 
     </script>
   
