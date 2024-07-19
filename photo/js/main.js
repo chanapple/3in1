@@ -270,17 +270,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// 유저가 그린 그림 객체 받아오기. 서버에서 draw 이벤트가 발생하면 실행되는 콜백함수.
 	socket.on("draw", data => {
-		console.log("Draw event received:", data);
+		console.log("Draw event received:", data, canvas);
 		//"fabric.util.enlivenObjects"은 JSON 데이터를 Fabric.js 객체로 변환하는 함수.
 		//[data]는 서버에서 전송된 데이터를 배열로 감싼 것
-		fabric.util.enlivenObjects([data], objects => {
-			objects.forEach(obj => {
-				canvas.add(obj); // 그림판에 그림을 추가함.
-				console.log("Object added to canvas:", obj);
-				// console.log(obj + "그림판에 그림 추가함.");
-			});
-		});
-		// console.log("main.js draw 콜백함수 실행됨.");
+		// fabric.util.enlivenObjects([data], objects => {
+		// 	console.log(objects);
+		// 	objects.forEach(obj => {
+		// 		canvas.add(obj); // 그림판에 그림을 추가함.
+		// 		console.log("Object added to canvas:", obj);
+		// 		// console.log(obj + "그림판에 그림 추가함.");
+		// 	});
+		// });
+		try {
+			// 데이터가 path 타입인지 확인
+			if (data.type === "path" || data.type === "Path") {
+				// Fabric.js Path 객체로 변환
+				const path = new fabric.Path(data.path, data);
+				canvas.add(path);
+				console.log("Path object added to canvas:", path);
+			} else {
+				console.error("Unsupported object type:", data.type);
+			}
+		} catch (error) {
+			console.error("Error parsing data:", error);
+		}
 	});
 
 	// 유저가 그림을 그릴 때
