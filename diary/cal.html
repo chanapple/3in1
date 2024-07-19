@@ -59,13 +59,14 @@
                     }
                 },
                 eventClick: function(arg) {
-                                info.event.remove();
-                    
+                    var confirmed = confirm('Are you sure you want to delete this event?');
+                    if (confirmed) {
+                    arg.event.remove();
+                    }
                 },
                 
                 events: [ // 일정 데이터 추가 , DB의 event를 가져오려면 JSON 형식으로 변환해 events에 넣어주면된다.
                     {
-                        id:'1',
                         title:'난 오늘 엄마랑 영화관에 가서 코난을 보고 같이 초밥을 먹고 집에서 잠을 잤다',
                         backgroundColor:'#ffffff00',
                         start:'2024-07-16 00:00:00',
