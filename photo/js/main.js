@@ -225,6 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			canvas.setActiveObject(e.target);
 		}
 		saveHistory(e);
+		socket.emit("sendCanvas", canvas.toJSON());
 	}
 
 	//"Ctrl+Z"에 대한 이벤트 리스너
@@ -253,7 +254,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// 소켓 연결되면
 	socket.on("connect", () => {
-		console.log("Connected to the server");
+		console.log("Connected to the server", socket.id);
+		socket.emit("getCanvas", socket.id);
+	});
+
+	socket.on("receiveCanvas", data => {
+		console.log("receiveCanvas", data, canvas);
+		if (data) {
+			canvas.loadFromJSON(data).then(function () {
+				canvas.renderAll();
+			});
+		}
+		canvas.renderAll();
 	});
 
 	// 유저가 그린 그림 객체 받아오기. 서버에서 draw 이벤트가 발생하면 실행되는 콜백함수.

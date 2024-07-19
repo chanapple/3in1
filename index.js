@@ -42,9 +42,26 @@ const io = new Server(httpServer, {
 	}
 });
 
+var user = {};
+var temp;
+
 //socket.io 연결
 io.on("connection", socket => {
 	console.log("A user connected");
+	user[socket.id] = {
+		id: socket.id
+	};
+
+	socket.on("sendCanvas", data => {
+		temp = data;
+	});
+
+	socket.on("getCanvas", () => {
+		if (user.length == 1) {
+			socket.emit("receiveCanvas", false);
+		}
+		socket.emit("receiveCanvas", temp);
+	});
 
 	//그림을 그리면
 	socket.on("draw", data => {
