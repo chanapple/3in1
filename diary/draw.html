@@ -512,17 +512,17 @@
         }
 
         // 페이지가 숨겨지거나 다시 보일 때 캔버스 데이터를 저장하고 로드
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'hidden') {
-                saveCanvasData();
-            } else if (document.visibilityState === 'visible') {
-                loadCanvasData();
-            }
-        });
+        // document.addEventListener('visibilitychange', function() {
+        //     if (document.visibilityState === 'hidden') {
+        //         saveCanvasData();
+        //     } else if (document.visibilityState === 'visible') {
+        //         loadCanvasData();
+        //     }
+        // });
 
         window.addEventListener('load', function() {
-            context.canvas.width = window.innerWidth;
-            context.canvas.height = window.innerHeight;
+            // context.canvas.width = window.innerWidth;
+            // context.canvas.height = window.innerHeight;
             loadCanvasData();
         });
 

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"> 
+    <title>Calendar</title> 
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css' rel='stylesheet'>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/locales-all.min.js'></script>
+    
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+
+	<link rel="stylesheet" href="/diary/css/main.css">
+
+    <script type="text/javascript">
+        var g_arg;
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar'); 
+            var calendar = new FullCalendar.Calendar(calendarEl, { //full-calendar 생성
+                height: '670px',    //높이 조절
+                expandRows: true,   //화면에 맞게 높이 설정
+                headerToolbar: {    // 달력 헤더
+                    left: 'prev,next',      //전달,다음달    
+                    center: 'title',          //2024년 07월
+                    right: 'today'        //오늘로 바로가기
+                },
+                initialView: 'dayGridMonth', // 첫화면을 달력으로
+                editable: true, // 수정 가능
+                selectable: true, // 달력 일자 드래그 설정가능
+                displayEventTime: false, // 시간 표시 안함
+                fixedWeekCount: false, // 막주에 맞춰 칸 조정
+                select: function(arg) {
+                    insertModalOpen(arg);	//일자 클릭 시 모달 호출
+                },
+                eventClick: function(arg) {
+                    insertModalOpen(arg);	//이벤트 클릭 시 모달 호출
+                },
+                dayMaxEvents: true, // 이벤트 오버 높이 제한 (+2)
+                eventAdd: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
+                    console.log(obj);
+                },
+                eventChange: function(obj) { // 이벤트가 수정되면 발생하는 이벤트
+                    console.log(obj);
+                },
+                eventRemove: function(obj) { // 이벤트가 제거되면 발생하는 이벤트
+                    console.log(obj);
+                },
+                select: function(arg) { // 캘린더에서 드래그로 이벤트를 생성
+                    var title = prompt('Event Title:');
+                    if (title) {
+                            calendar.addEvent({ //이벤트 추가~
+                                title: title,
+                                start: arg.start,
+                                end: arg.end,
+                                allDay: arg.allDay
+                            })
+                    }
+                },
+                eventClick: function(arg) {
+                                info.event.remove();
+                    
+                },
+                
+                events: [ // 일정 데이터 추가 , DB의 event를 가져오려면 JSON 형식으로 변환해 events에 넣어주면된다.
+                    {
+                        id:'1',
+                        title:'난 오늘 엄마랑 영화관에 가서 코난을 보고 같이 초밥을 먹고 집에서 잠을 잤다',
+                        backgroundColor:'#ffffff00',
+                        start:'2024-07-16 00:00:00',
+                        end:'2024-07-18 00:00:00',
+                    }
+                ],
+            });
+            calendar.render();
+        });
+        function removeEventFromCalendar(id)
+        {
+            var calendarEvent=calendar.getEventById(id);
+            calendarEvent.remove();
+        }
+    </script>
+<style>
+    html, body {
+        overflow: hidden; /*스크롤바 감춤*/
+        padding-left: 2em;
+        padding-right: 2em;
+        font-size: 14px;
+    }
+    .fc-header-toolbar {    /*2024년 어쩌구 위에 간격*/
+        padding-top: 2em;
+    }
+    .fc-day-sun a {     /*일요일*/
+        color: red;
+        text-decoration: none;
+    }
+    .fc-day-sat a {     /*토요일*/
+        color: blue;
+        text-decoration: none;
+    }
+    .fc-prev-button.fc-button.fc-button-primary,    /*이전달 버튼 색상*/ 
+    .fc-next-button.fc-button.fc-button-primary,    /*다음달 버튼 색상*/
+    .fc-today-button.fc-button.fc-button-primary {  /*today 버튼 색상*/
+        background: white;
+        color: black;
+    }
+    .fc-event-title.fc-sticky, 
+    .fc-event-title-container, 
+    .fc-daygrid-event-harness  {    /*event 색상*/
+        background: white;
+        color: black;
+    }
+    .fc-h-event {   /*event 테두리 색상*/
+        border: #00000000;
+    }
+  /*모달 푸터*/
+  .modal-footer{
+  	display:inline-block;
+  }
+</style>
+</head>
+<body>
+	<div>
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; margin-top: 5px;">
+                <div style="display: flex; flex-direction: row; align-items: center;">
+                    <button id="drawButton" style="display: inline-block;">
+                        <img src="/diary/image/free-icon-paintbrush-2050922.png" width="25px">
+                    </button>
+                    <button id="stopDrawButton" style="display: none;">
+                        <img src="/diary/image/free-icon-paintbrush-2050921.png" width="25px">
+                    </button>
+                    <button id="highlighterBtn" style="display: inline-block;">
+                        <img src="/diary/image/free-icon-highlighter-658024.png" width="30px">
+                    </button>
+                    <button id="stopHighlighterBtn" style="display: none;">
+                        <img src="/diary/image/free-icon-highlighter-658125.png" width="30px">
+                    </button>
+                    <button id="eraseButton" style="display: inline-block;">
+                        <img src="/diary/image/free-icon-eraser-1983945.png" width="30px">
+                    </button>
+                    <button id="stopEraseButton" style="display: none;">
+                        <img src="/diary/image/free-icon-eraser-1983927.png" width="30px">
+                    </button>
+                    <button id="imageBtn" style="margin-right: 10px;">사진</button>
+                    <input type="file" id="file-input" multiple style="margin-right: 10px;">
+                    <button id="saveButton" style="margin-right: 10px;">Save</button>
+                
+                </div>
+                
+                <button class="dropdown" style="display: flex; flex-direction: row; align-items: center;">
+                    <img src="/diary/image/free-icon-color-palette-12471763.png" width="30px">
+                </button>
+                
+            </div>
+        </div>
+        
+        <img id="imgObj" alt="Image Preview" >
+
+        <script>
+            const fileInput = document.getElementById('file-input');
+            const imageObj = document.getElementById('imgObj');
+
+            fileInput.addEventListener('change', function(event) {
+            const files = event.target.files;
+            for (let file of files) {
+                if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const newImageObj = document.createElement('img');
+                            newImageObj.src = e.target.result;
+                            newImageObj.style.position = 'absolute';
+                            newImageObj.style.zIndex = 2;
+                            newImageObj.style.cursor = 'grab';
+                            document.body.appendChild(newImageObj);
+                            
+                            // 크기 조절 핸들 추가
+                            const resizeHandle = document.createElement('div');
+                            resizeHandle.classList.add('resize-handle');
+                            document.body.appendChild(resizeHandle);
+
+                            // 초기 크기 조절 핸들 위치 설정
+                            updateResizeHandlePosition(newImageObj, resizeHandle);
+                            
+                            // 이미지 이동 
+                            newImageObj.addEventListener('mousedown', dragStart);
+                            document.addEventListener('mouseup', dragEnd);
+                            document.addEventListener('mousemove', drag);
+                            
+                            // 이미지 크기 조절
+                            resizeHandle.addEventListener('mousedown', resizeStart);
+                            document.addEventListener('mousemove', resize);
+                            document.addEventListener('mouseup', resizeEnd);
+
+                            newImageObj.addEventListener('mouseenter', function(e) {
+                                const stopDrawButton = document.getElementById('stopDrawButton');
+                                if (stopDrawButton.style.display === 'none') {
+                                    newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
+                                }
+                            });
+
+                            newImageObj.addEventListener('click', function() {
+                                resizeHandle.style.display = 'block';
+                            });
+
+                            document.addEventListener('click', function(e) {
+                                if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
+                                    resizeHandle.style.display = 'none';
+                                }
+                                
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
+
+            let isResizing = false;
+            let img, resizeHandle, startWidth, startHeight, startMouseX, startMouseY;
+
+            function updateResizeHandlePosition(imageObj, handle) {
+                handle.style.left = (imageObj.offsetLeft + imageObj.clientWidth - 5) + 'px';
+                handle.style.top = (imageObj.offsetTop + imageObj.clientHeight - 5) + 'px';
+            }
+
+            function resizeStart(e) {
+                isResizing = true;
+                img = e.target.previousElementSibling;
+                resizeHandle = e.target;
+                startWidth = img.clientWidth;
+                startHeight = img.clientHeight;
+                startMouseX = e.clientX;
+                startMouseY = e.clientY;
+                e.preventDefault();
+            }
+
+            function resize(e) {
+                if (isResizing) {
+                    const newWidth = startWidth + (e.clientX - startMouseX);
+                    const newHeight = startHeight + (e.clientY - startMouseY);
+                    img.style.width = `${newWidth}px`;
+                    img.style.height = `${newHeight}px`;
+                    updateResizeHandlePosition(img, resizeHandle);
+
+                    // 크기 조정 후 위치 저장
+                    localStorage.setItem('lastImgWidth', img.style.width);
+                    localStorage.setItem('lastImgHeight', img.style.height);
+                }
+            }
+
+            function resizeEnd(e) {
+                if (isResizing) {
+                    isResizing = false;
+                    resizeHandle.style.display = 'none';
+                }
+            }
+
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+
+            function dragStart(e) {
+                const stopDrawButton = document.getElementById('stopDrawButton');
+                if (stopDrawButton.style.display !== 'none') {
+                    e.preventDefault(); 
+                    return;
+                }
+
+                if (e.button === 0 && e.target.tagName === 'IMG') { 
+                    isDragging = true;
+                    const imageObj = e.target;
+                    startX = e.clientX;
+                    startY = e.clientY;
+
+                    const style = window.getComputedStyle(imageObj);
+                    initialX = parseInt(style.left, 10) || 0;
+                    initialY = parseInt(style.top, 10) || 0;
+
+                    imageObj.style.cursor = 'grabbing';
+                }
+            }
+
+            function dragEnd(e) {
+                if (isDragging) {
+                    isDragging = false;
+                    const imageObj = document.querySelector('img[style*="grabbing"]');
+                    if (imageObj) {
+                        imageObj.style.cursor = 'grab';
+                         // 최종 위치 저장
+                        localStorage.setItem('lastImgLeft', imageObj.style.left);
+                        localStorage.setItem('lastImgTop', imageObj.style.top);
+
+                        const resizeHandle = imageObj.nextElementSibling;
+                        updateResizeHandlePosition(imageObj, resizeHandle);
+                        resizeHandle.style.display = 'none'; // 드래그가 끝나면 핸들을 숨김
+                    }
+                }
+            }
+
+            function drag(e) {
+                if (isDragging && e.button === 0) {
+                    e.preventDefault();
+                    const imageObj = document.querySelector('img[style*="grabbing"]');
+
+                    if (imageObj) {
+                        const dx = e.clientX - startX;
+                        const dy = e.clientY - startY;
+
+                        imageObj.style.left = `${initialX + dx}px`;
+                        imageObj.style.top = `${initialY + dy}px`;
+
+                        const resizeHandle = imageObj.nextElementSibling;
+                        updateResizeHandlePosition(imageObj, resizeHandle);
+                    }
+                }
+            }
+
+            // 초기 커서 설정
+            document.getElementById('file-input').style.display = 'none';
+
+            document.getElementById('imageBtn').addEventListener('click', function() {
+                const fileInput = document.getElementById('file-input');
+                const drawButton = document.getElementById('drawButton');
+                
+                if (stopDrawButton.style.display !== 'none') {
+                    stopDrawButton.style.display = 'none';
+                    drawButton.style.display = 'inline-block';
+                }
+                
+                fileInput.style.display = fileInput.style.display === 'none' ? 'block' : 'none';
+                canvas.style.zIndex = 2;
+                canvas.removeEventListener('mousedown', startDrawing);
+                canvas.removeEventListener('mousemove', draw);
+                canvas.removeEventListener('mouseup', stopDrawing);
+            });
+            
+         </script>
+
+        <div class="toolbar" style="position: absolute; z-index: 4;">
+            <input id="color" type="color">
+            <br>
+            <label for="slider">PX</label>
+            <input type="range" min="1" max="50" value="10" id="slider" onchange="lineWidthReSizeForSlider()">
+        </div>
+    </div>
+
+    <!-- 툴바 -->
+    <script>
+        let toggleInit = (function () {  
+            let status = true;   
+            
+            return function () {    
+                if (status) {      
+                    document.querySelector('.toolbar').classList.add('show'); 
+                    const drop = document.querySelector('.dropdown');
+                    drop.innerHTML = '<img src="/diary/image/free-icon-color-palette-12471709.png" width="30px" style="margin-left: 10px;">';     
+                } else {      
+                    document.querySelector('.toolbar').classList.remove('show'); 
+                    const drop = document.querySelector('.dropdown');
+                    drop.innerHTML = '<img src="/diary/image/free-icon-color-palette-12471763.png" width="30px" style="margin-left: 10px;">';  
+                }    
+                status = !status;  
+            }
+        })(); 
+        
+        document.querySelector('.dropdown').addEventListener('click', toggleInit);
+	</script>
+
+	<canvas id="myCanvas" style="position: absolute; z-index: 3;"></canvas>
+
+	<script>
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        var isDrawing = false;
+        var lastX = 0;
+        var lastY = 0;
+		let lineWidth = 10;
+        let isHighlighterMode = false; // 형광펜 모드인지 여부를 나타내는 플래그
+        
+        context.canvas.width  = window.innerWidth;
+        context.canvas.height = window.innerHeight;
+
+        const color = document.getElementById("color");
+
+        // 굵기 기능
+		function lineWidthReSizeForSlider() {
+			let sliderValue = document.getElementById('slider')
+			lineWidth = sliderValue.value;
+			document.getElementById('lineWidth').innerText = String(lineWidth);
+		}
+
+        // 그리기 기본 기능
+        function startDrawing(event) {
+            isDrawing = true;
+            [lastX, lastY] = [event.offsetX, event.offsetY];
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(event.offsetX, event.offsetY);
+            if (isHighlighterMode) {
+                // 형광펜 모드
+                context.globalAlpha = 0.5;
+                context.lineCap = 'butt';
+            } else {
+                context.globalAlpha = 1; // 일반 그리기 모드
+                context.lineCap = 'round';
+            }
+			context.lineWidth = lineWidth; 
+            context.stroke();
+            [lastX, lastY] = [event.offsetX, event.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            context.globalAlpha = 1; // 그리기가 종료되면 불투명도를 원래대로 설정
+        }
+
+
+        // 지우개 버튼 클릭 시
+        document.getElementById('eraseButton').addEventListener('click', function() {
+            context.globalCompositeOperation = 'destination-out'; // 지우개 
+            this.style.display = 'none';
+            document.getElementById('stopEraseButton').style.display = 'inline-block';
+            document.getElementById('stopDrawButton').style.display = 'none';
+            document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing); 
+            isHighlighterMode = false; // 형광펜 모드 해제
+        });
+
+        // 지우개 정지 버튼 클릭 시
+        document.getElementById('stopEraseButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('eraseButton').style.display = 'inline-block';
+            document.getElementById('stopDrawButton').style.display = 'none';
+            document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing); 
+            isHighlighterMode = false; // 형광펜 모드 해제
+            context.globalCompositeOperation = 'source-over';
+        });
+
+        // 그리기 버튼 클릭 시
+        document.getElementById('drawButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('stopDrawButton').style.display = 'inline-block';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            document.getElementById('stopHighlighterBtn').style.display = 'none';
+            document.getElementById('eraseButton').style.display = 'inline-block';
+            document.getElementById('stopEraseButton').style.display = 'none';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            isHighlighterMode = false; // 형광펜 모드 해제
+            context.globalCompositeOperation = 'source-over';
+            canvas.style.zIndex = 3;
+        });
+
+        // 그리기 정지 버튼 클릭 시
+        document.getElementById('stopDrawButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('drawButton').style.display = 'inline-block';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            isDrawing = false;
+            context.globalAlpha = 1; // 그리기가 정지되면 불투명도를 원래대로 설정
+            canvas.style.zIndex = 3;
+        });
+
+        // 형광펜 버튼 클릭 시
+        document.getElementById('highlighterBtn').addEventListener('click', function() {
+            document.getElementById('drawButton').style.display = 'inline-block';
+            document.getElementById('stopDrawButton').style.display = 'none';
+            document.getElementById('stopHighlighterBtn').style.display = 'inline-block';
+            document.getElementById('eraseButton').style.display = 'inline-block';
+            document.getElementById('stopEraseButton').style.display = 'none';
+            this.style.display = 'none';
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            isHighlighterMode = true; // 형광펜 모드 활성화
+            context.globalCompositeOperation = 'source-over';
+            canvas.style.zIndex = 3;
+        });
+
+        // 형광펜 정지 버튼 클릭 시 
+        document.getElementById('stopHighlighterBtn').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('highlighterBtn').style.display = 'inline-block';
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            isHighlighterMode = false; // 형광펜 모드 활성화
+            canvas.style.zIndex = 3;
+        });
+
+        // 색 변경 기능
+        function oncolorChange(event) {
+            context.strokeStyle = event.target.value;
+        }
+        
+        color.addEventListener("change", oncolorChange);
+
+        // 저장 버튼 클릭 시 
+        document.getElementById('saveButton').addEventListener('click', saveCanvasData);
+
+         // 로컬스토리지에 캔버스 데이터 저장하는 기능 
+        function saveCanvasData() {
+            // 캔버스 그림 저장
+            localStorage.setItem('canvasImage', canvas.toDataURL());
+
+            // 추가된 이미지 저장
+            const addedImages = document.querySelectorAll('img');
+            let imageArray = [];
+            addedImages.forEach((image, index) => {
+                if (image.src.startsWith('data:image')) {
+                    const imageId = `image_${index}`; // 각 이미지를 식별할 고유한 식별자
+                    localStorage.setItem(`${imageId}_src`, image.src);
+                    localStorage.setItem(`${imageId}_left`, image.style.left);
+                    localStorage.setItem(`${imageId}_top`, image.style.top);
+                    localStorage.setItem(`${imageId}_width`, image.style.width);
+                    localStorage.setItem(`${imageId}_height`, image.style.height);
+                    imageArray.push(imageId);
+                }
+            });
+            localStorage.setItem('addedImages', JSON.stringify(imageArray));
+
+            localStorage.setItem('lineWidth', lineWidth);
+            localStorage.setItem('color', color.value);
+
+            // // 저장 잘 됐는지 확인용 
+            alert('저장되었습니다!');
+        }
+
+        // 로컬스토리지로부터 저장된 캔버스 데이터 불러오는 기능
+        function loadCanvasData() {
+            const savedImage = localStorage.getItem('canvasImage');
+            if (savedImage) {
+                const img = new Image();
+                img.onload = function() {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0);
+                };
+                img.src = savedImage;
+            }
+
+            const savedImages = localStorage.getItem('addedImages');
+            if (savedImages) {
+                const imageArray = JSON.parse(savedImages);
+                imageArray.forEach(imageId => {
+                    const src = localStorage.getItem(`${imageId}_src`);
+                    const left = localStorage.getItem(`${imageId}_left`);
+                    const top = localStorage.getItem(`${imageId}_top`);
+                    const width = localStorage.getItem(`${imageId}_width`);
+                    const height = localStorage.getItem(`${imageId}_height`);
+
+                    if (src && left && top && width && height) {
+                        const newImageObj = document.createElement('img');
+                        newImageObj.src = src;
+                        newImageObj.style.position = 'absolute';
+                        newImageObj.style.zIndex = 2;
+                        newImageObj.style.cursor = 'grab';
+                        newImageObj.style.left = left;
+                        newImageObj.style.top = top;
+                        newImageObj.style.width = width;
+                        newImageObj.style.height = height;
+
+                        document.body.appendChild(newImageObj);
+
+                        const resizeHandle = document.createElement('div');
+                        resizeHandle.classList.add('resize-handle');
+                        document.body.appendChild(resizeHandle);
+
+                        updateResizeHandlePosition(newImageObj, resizeHandle);
+
+                        newImageObj.addEventListener('mousedown', dragStart);
+                        document.addEventListener('mouseup', dragEnd);
+                        document.addEventListener('mousemove', drag);
+
+                        resizeHandle.addEventListener('mousedown', resizeStart);
+                        document.addEventListener('mousemove', resize);
+                        document.addEventListener('mouseup', resizeEnd);
+
+                        newImageObj.addEventListener('mouseenter', function(e) {
+                            const stopDrawButton = document.getElementById('stopDrawButton');
+                            if (stopDrawButton.style.display === 'none') {
+                                newImageObj.style.pointerEvents = 'auto'; // 마우스 이벤트 무시
+                            }
+                        });
+
+                        newImageObj.addEventListener('click', function() {
+                            resizeHandle.style.display = 'block';
+                        });
+
+                        document.addEventListener('click', function(e) {
+                            if (!newImageObj.contains(e.target) && !resizeHandle.contains(e.target)) {
+                                resizeHandle.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            }
+
+            const savedLineWidth = localStorage.getItem('lineWidth');
+            if (savedLineWidth) {
+                lineWidth = parseInt(savedLineWidth);
+                document.getElementById('slider').value = lineWidth;
+                document.getElementById('lineWidth').innerText = String(lineWidth);
+            }
+
+            const savedColor = localStorage.getItem('color');
+            if (savedColor) {
+                color.value = savedColor;
+                context.strokeStyle = savedColor;
+            }
+        }
+
+        // 페이지가 숨겨지거나 다시 보일 때 캔버스 데이터를 저장하고 로드
+        // document.addEventListener('visibilitychange', function() {
+        //     if (document.visibilityState === 'hidden') {
+        //         saveCanvasData();
+        //     } else if (document.visibilityState === 'visible') {
+        //         loadCanvasData();
+        //     }
+        // });
+
+        window.addEventListener('load', function() {
+            // context.canvas.width = window.innerWidth;
+            // context.canvas.height = window.innerHeight;
+            loadCanvasData();
+        });
+
+		document.getElementById('cal').addEventListener('click', function() {
+            canvas.style.zIndex = 3;
+        });
+    </script>
+	
+</body>
+</html>
