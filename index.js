@@ -43,7 +43,9 @@ io.on("connection", socket => {
 		//rotation: 0,
 		x: 4100,
 		y: 3100,
-		playerId: socket.id
+		playerId: socket.id,
+		anim: "idle",
+		direction: false
 		//team: Math.floor(Math.random() * 2) == 0 ? "red" : "blue"
 	};
 	// send the players object to the new player
@@ -62,6 +64,8 @@ io.on("connection", socket => {
 	socket.on("playerMovement", function (movementData) {
 		players[socket.id].x = movementData.x;
 		players[socket.id].y = movementData.y;
+		players[socket.id].anim = movementData.anim;
+		players[socket.id].direction = movementData.direction;
 		// emit a message to all players about the player that moved
 		socket.broadcast.emit("playerMoved", players[socket.id]);
 	});

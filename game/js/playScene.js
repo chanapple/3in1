@@ -18,6 +18,7 @@ class play extends Scene {
 
 		this.stars;
 		this.player;
+
 		this.otherPlayers;
 		this.cursors;
 		this.groundBlock;
@@ -94,6 +95,21 @@ class play extends Scene {
 			self.otherPlayers.getChildren().forEach(function (otherPlayer) {
 				if (playerInfo.playerId === otherPlayer.playerId) {
 					otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+
+					if (!(otherPlayer.flipX == playerInfo.direction)) {
+						if (playerInfo.direction == false) {
+							otherPlayer.setFlipX(false);
+						} else otherPlayer.setFlipX(true);
+					}
+
+					if (
+						!(
+							otherPlayer.anims.currentAnim.key == "jump" &&
+							playerInfo.anim == "jump"
+						)
+					) {
+						otherPlayer.anims.play(playerInfo.anim, true);
+					}
 				}
 			});
 		});
@@ -149,6 +165,7 @@ class play extends Scene {
 			if (cursors.left.isDown) {
 				/** 캐릭터가 왼족을 바라봄 */
 				this.player.setFlipX(true);
+				this.player.direction = true;
 				/** 캐릭터가 왼쪽으로 260의 속도로 움직임 */
 				this.player.setVelocityX(-260);
 				/** 캐릭터가 바닥에 닿아 있는지 확인 */
@@ -160,6 +177,7 @@ class play extends Scene {
 				/** 사용자가 오른쪽 키를 눌렀는지 확인 */
 				/** 캐릭터가 오른쪽을 바라봄 */
 				this.player.setFlipX(false);
+				this.player.direction = false;
 				/** 캐릭터가 오른쪽으로 260의 속도로 윰직임 */
 				this.player.setVelocityX(260);
 				/** 캐릭터가 바닥에 닿아 있는지 확인 */
@@ -185,7 +203,6 @@ class play extends Scene {
 					this.player.anims.play("drop", true);
 				}
 			}
-
 			// emit player movement
 			var x = this.player.x;
 			var y = this.player.y;
@@ -195,7 +212,9 @@ class play extends Scene {
 			) {
 				this.socket.emit("playerMovement", {
 					x: this.player.x,
-					y: this.player.y
+					y: this.player.y,
+					anim: this.player.anims.currentAnim.key,
+					direction: this.player.direction
 				});
 			}
 			// save old position data
@@ -211,8 +230,8 @@ function addPlayer(self, playerInfo) {
 	self.player = self.physics.add
 		.sprite(playerInfo.x, playerInfo.y, "knight")
 		.setScale(2.5);
-	self.player.setBounce(0.2);
 	self.physics.add.collider(self.player, self.groundBlock);
+	self.player.direction = false;
 	console.log("ap");
 }
 function addOtherPlayers(self, playerInfo) {
@@ -221,6 +240,7 @@ function addOtherPlayers(self, playerInfo) {
 		.setScale(2.5);
 	otherPlayer.playerId = playerInfo.playerId;
 	self.otherPlayers.add(otherPlayer);
+	otherPlayer.anims.play("idle");
 	self.physics.add.collider(self.otherPlayers, self.groundBlock);
 	console.log("aop");
 }
