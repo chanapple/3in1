@@ -2,7 +2,9 @@
 <html>
 <head>
     <meta charset='utf-8'>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">  
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"> 
+    <title>Calendar</title> 
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css' rel='stylesheet'>
@@ -13,72 +15,71 @@
     <script src="https://unpkg.com/tippy.js@6"></script>
 
     <script type="text/javascript">
+        var g_arg;
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar'); 
             var calendar = new FullCalendar.Calendar(calendarEl, { //full-calendar 생성
                 height: '670px',    //높이 조절
                 expandRows: true,   //화면에 맞게 높이 설정
-                customButtons:{
-                    myCustomButton:{
-                        text:"add",
-                        click:function(){
-                            $("#exampleModal").modal("show");
-                        }
-                    }
-                },
                 headerToolbar: {    // 달력 헤더
                     left: 'prev,next',      //전달,다음달    
                     center: 'title',          //2024년 07월
-                    right: 'today,myCustomButton'        //오늘로 바로가기
+                    right: 'today'        //오늘로 바로가기
                 },
                 initialView: 'dayGridMonth', // 첫화면을 달력으로
                 editable: true, // 수정 가능
                 selectable: true, // 달력 일자 드래그 설정가능
                 displayEventTime: false, // 시간 표시 안함
                 fixedWeekCount: false, // 막주에 맞춰 칸 조정
-                
+                select: function(arg) {
+                    insertModalOpen(arg);	//일자 클릭 시 모달 호출
+                },
+                eventClick: function(arg) {
+                    insertModalOpen(arg);	//이벤트 클릭 시 모달 호출
+                },
                 dayMaxEvents: true, // 이벤트 오버 높이 제한 (+2)
                 eventAdd: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
                     console.log(obj);
                 },
-                eventChange: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
+                eventChange: function(obj) { // 이벤트가 수정되면 발생하는 이벤트
                     console.log(obj);
                 },
                 eventRemove: function(obj) { // 이벤트가 제거되면 발생하는 이벤트
                     console.log(obj);
                 },
-                eventDidMount: function(info) { 
-                    tippy(info.el, {
-                        content: info.event._def.title,
-                        placement: "bottom",
-                        offset: [0,0],
-                        interactive: true,
-                    })
-                },
                 select: function(arg) { // 캘린더에서 드래그로 이벤트를 생성
                     var title = prompt('Event Title:');
                     if (title) {
-                            calendar.addEvent({
+                            calendar.addEvent({ //이벤트 추가~
                                 title: title,
                                 start: arg.start,
                                 end: arg.end,
                                 allDay: arg.allDay
                             })
                     }
-                calendar.unselect()
+                },
+                eventClick: function(arg) {
+                    
+                    }
                 },
                 
                 events: [ // 일정 데이터 추가 , DB의 event를 가져오려면 JSON 형식으로 변환해 events에 넣어주면된다.
                     {
-                        title:'MT',
-                        backgroundColor:'#',
-                        start:'2024-07-20 00:00:00',
-                        end:'2024-07-22 24:00:00'
+                        id:'1',
+                        title:'난 오늘 엄마랑 영화관에 가서 코난을 보고 같이 초밥을 먹고 집에서 잠을 잤다',
+                        backgroundColor:'#ffffff00',
+                        start:'2024-07-16 00:00:00',
+                        end:'2024-07-18 00:00:00',
                     }
                 ],
             });
             calendar.render();
         });
+        function removeEventFromCalendar(id)
+        {
+            var calendarEvent=calendar.getEventById(id);
+            calendarEvent.remove();
+        }
     </script>
 <style>
     html, body {
@@ -98,71 +99,33 @@
         color: blue;
         text-decoration: none;
     }
-    .fc-prev-button.fc-button.fc-button-primary {   /*이전달 버튼 색상*/ 
-        background: white;
-        color: black;
-    }
-    .fc-next-button.fc-button.fc-button-primary {   /*다음달 버튼 색상*/
-        background: white;
-        color: black;
-    }
+    .fc-prev-button.fc-button.fc-button-primary,    /*이전달 버튼 색상*/ 
+    .fc-next-button.fc-button.fc-button-primary,    /*다음달 버튼 색상*/
     .fc-today-button.fc-button.fc-button-primary {  /*today 버튼 색상*/
         background: white;
         color: black;
     }
+    .fc-event-title.fc-sticky, 
+    .fc-event-title-container, 
+    .fc-daygrid-event-harness  {    /*event 색상*/
+        background: white;
+        color: black;
+    }
+    .fc-h-event {   /*event 테두리 색상*/
+        border: #00000000;
+    }
+  /*모달 푸터*/
+  .modal-footer{
+  	display:inline-block;
+  }
 </style>
 </head>
-<body >
+<body>
     <div id="calendarBox">
         <div id="calendar"></div>
     </div>
-    <div
-    class="modal fade"
-    id="exampleModal"
-    tabindex="-1"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">일정 추가하기</h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          일정이름 : <input type="text" id="title" /><br />
-          시작시간 : <input type="datetime-local" id="start" /><br />
-          종료시간 : <input type="datetime-local" id="end" /><br />
-          배경색상 :
-          <select id="color">
-            <option value="red">빨강색</option>
-            <option value="orange">주황색</option>
-            <option value="yellow">노랑색</option>
-            <option value="green">초록색</option>
-            <option value="blue">파랑색</option>
-            <option value="indigo">남색</option>
-            <option value="purple">보라색</option>
-          </select>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            취소
-          </button>
-          <button type="button" class="btn btn-primary" id="saveChanges">
-            추가
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div class="mb-3">
+        <input type="hidden" class="form-control" id="docName">
+	</div>
 </body>
 </html>
