@@ -1,0 +1,52 @@
+.toolbar { 
+    display: none; 
+    position: relative; 
+    width: 200px; 
+    padding: 15px; 
+    background: #fbf5f1; 
+    text-align: center; 
+    -webkit-box-shadow: 0 10px 21px -2px rgba(50,51,42,0.2); 
+    box-shadow: 0 10px 21px -2px rgba(50,51,42,0.2); 
+}    
+.toolbar.show { 
+    display: block; 
+}    
+
+#color {
+    width: 130px;
+    height: 80px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    border: none;
+}
+
+#drawButton, #stopDrawButton, #eraseButton, #stopEraseButton, #highlighterBtn, #stopHighlighterBtn {
+    border: 0px;
+    background-color: #fff;
+}
+
+.dropdown {
+    border: 0px;
+    background-color: #fff;
+}
+
+#imgObj {
+    position: absolute;
+    z-index: 2;
+    cursor: grab;
+    display: none; /* 처음에는 이미지를 숨김 */
+}
+
+/* 이미지 크기 조절 핸들러 */
+.resize-handle {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #000000;
+    cursor: nwse-resize;
+    z-index: 3;
+    display: none;
+}

@@ -8,6 +8,9 @@ const __dirname = path.resolve();
 function viewIndex(req, res) {
 	res.sendFile(path.join(__dirname, "/diary/index.html"));
 }
+function viewDraw(req, res) {
+	res.sendFile(path.join(__dirname, "/diary/draw.html"));
+}
 
 /** 모듈 내보내기 */
-export default {viewIndex};
+export default {viewIndex, viewDraw};
