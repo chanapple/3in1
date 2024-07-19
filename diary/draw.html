@@ -8,34 +8,33 @@
 </head>
 <body>
     <div>
-        <div style="display: flex; flex-direction: column; align-items: flex-start; ">
-            <div style="display: flex; flex-direction: row; align-items: center; margin-top: 5px">
-                <button id="drawButton" style="display: inline-block; margin-right: 8px;">
-                    <img src="/diary/image/free-icon-paintbrush-2050922.png" width="30px" >
-                </button>
-                <button id="stopDrawButton" style="display: none; margin-right: 8px;">
-                    <img src="/diary/image/free-icon-paintbrush-2050921.png" width="30px">
-                </button>
-                <button id="highlighterBtn" style="margin-right: 10px; display: inline-block;">
-                    <img src="/diary/image/free-icon-highlighter-1827994.png" width="30px">
-                </button>
-                <button id="stopHighlighterBtn" style="margin-right: 10px; display: none;">
-                    <img src="/diary/image/free-icon-highlighter-1827980.png" width="30px">
-                </button>
-                <button id="eraseButton" style="margin-right: 10px; display: inline-block;">
-                    <img src="/diary/image/free-icon-eraser-152689.png" width="30px">
-                </button>
-                <button id="stopEraseButton" style="margin-right: 10px; display: none;">
-                    <img src="/diary/image/free-icon-eraser-153580.png" width="30px">
-                </button>
-                <button id="imageBtn" style="margin-right: 10px;">사진</button>
-                <input type="file" id="file-input" multiple>
-                <button id="saveButton">Save</button>
-            </div>
-            
-            <div style="display: flex; flex-direction: row; align-items: center; ">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; margin-top: 5px;">
+                <div style="display: flex; flex-direction: row; align-items: center;">
+                    <button id="drawButton" style="display: inline-block; margin-right: 8px;">
+                        <img src="/diary/image/free-icon-paintbrush-2050922.png" width="30px">
+                    </button>
+                    <button id="stopDrawButton" style="display: none; margin-right: 8px;">
+                        <img src="/diary/image/free-icon-paintbrush-2050921.png" width="30px">
+                    </button>
+                    <button id="highlighterBtn" style="margin-right: 10px; display: inline-block;">
+                        <img src="/diary/image/free-icon-highlighter-1827994.png" width="30px">
+                    </button>
+                    <button id="stopHighlighterBtn" style="margin-right: 10px; display: none;">
+                        <img src="/diary/image/free-icon-highlighter-1827980.png" width="30px">
+                    </button>
+                    <button id="eraseButton" style="margin-right: 10px; display: inline-block;">
+                        <img src="/diary/image/free-icon-eraser-1983945.png" width="40px">
+                    </button>
+                    <button id="stopEraseButton" style="margin-right: 10px; display: none;">
+                        <img src="/diary/image/free-icon-eraser-1983927.png" width="40px">
+                    </button>
+                    <button id="imageBtn" style="margin-right: 10px;">사진</button>
+                    <input type="file" id="file-input" multiple style="margin-right: 10px;">
+                    <button id="saveButton" style="margin-right: 10px;">Save</button>
+                </div>
                 <button class="dropdown" style="display: flex; flex-direction: row; align-items: center;">
-                    <img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 10px;">
+                    <img src="/diary/image/free-icon-color-palette-12471763.png" width="40px">
                 </button>
             </div>
         </div>
@@ -237,19 +236,17 @@
                 if (status) {      
                     document.querySelector('.toolbar').classList.add('show'); 
                     const drop = document.querySelector('.dropdown');
-                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="transform: rotate(180deg); margin-left: 10px;">';     
+                    drop.innerHTML = '<img src="/diary/image/free-icon-color-palette-12471709.png" width="40px" style="margin-left: 10px;">';     
                 } else {      
                     document.querySelector('.toolbar').classList.remove('show'); 
                     const drop = document.querySelector('.dropdown');
-                    drop.innerHTML = '<img src="/diary/image/free-icon-arrow-down-sign-to-navigate-32195.png" width="12px" style="margin-left: 10px;">';  
+                    drop.innerHTML = '<img src="/diary/image/free-icon-color-palette-12471763.png" width="40px" style="margin-left: 10px;">';  
                 }    
                 status = !status;  
             }
         })(); 
         
         document.querySelector('.dropdown').addEventListener('click', toggleInit);
-
-      
 	</script>
 
 	<canvas id="myCanvas" style="position: absolute; z-index: 3;"></canvas>
