@@ -424,8 +424,8 @@
             localStorage.setItem('lineWidth', lineWidth);
             localStorage.setItem('color', color.value);
 
-            // 저장 잘 됐는지 확인용 
-            alert('캔버스 데이터 저장 성공');
+            // // 저장 잘 됐는지 확인용 
+            // alert('저장되었습니다!');
         }
 
         // 로컬스토리지로부터 저장된 캔버스 데이터 불러오는 기능
@@ -511,7 +511,20 @@
             }
         }
 
-        window.addEventListener('load', loadCanvasData);
+        // 페이지가 숨겨지거나 다시 보일 때 캔버스 데이터를 저장하고 로드
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                saveCanvasData();
+            } else if (document.visibilityState === 'visible') {
+                loadCanvasData();
+            }
+        });
+
+        window.addEventListener('load', function() {
+            context.canvas.width = window.innerWidth;
+            context.canvas.height = window.innerHeight;
+            loadCanvasData();
+        });
     </script>
   
     
