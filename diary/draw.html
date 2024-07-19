@@ -11,31 +11,34 @@
         <div style="display: flex; flex-direction: column; align-items: flex-start;">
             <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; margin-top: 5px;">
                 <div style="display: flex; flex-direction: row; align-items: center;">
-                    <button id="drawButton" style="display: inline-block; margin-right: 8px;">
-                        <img src="/diary/image/free-icon-paintbrush-2050922.png" width="30px">
+                    <button id="drawButton" style="display: inline-block;">
+                        <img src="/diary/image/free-icon-paintbrush-2050922.png" width="35px">
                     </button>
-                    <button id="stopDrawButton" style="display: none; margin-right: 8px;">
-                        <img src="/diary/image/free-icon-paintbrush-2050921.png" width="30px">
+                    <button id="stopDrawButton" style="display: none;">
+                        <img src="/diary/image/free-icon-paintbrush-2050921.png" width="35px">
                     </button>
-                    <button id="highlighterBtn" style="margin-right: 10px; display: inline-block;">
-                        <img src="/diary/image/free-icon-highlighter-1827994.png" width="30px">
+                    <button id="highlighterBtn" style="display: inline-block;">
+                        <img src="/diary/image/free-icon-highlighter-658024.png" width="40px">
                     </button>
-                    <button id="stopHighlighterBtn" style="margin-right: 10px; display: none;">
-                        <img src="/diary/image/free-icon-highlighter-1827980.png" width="30px">
+                    <button id="stopHighlighterBtn" style="display: none;">
+                        <img src="/diary/image/free-icon-highlighter-658125.png" width="40px">
                     </button>
-                    <button id="eraseButton" style="margin-right: 10px; display: inline-block;">
+                    <button id="eraseButton" style="display: inline-block;">
                         <img src="/diary/image/free-icon-eraser-1983945.png" width="40px">
                     </button>
-                    <button id="stopEraseButton" style="margin-right: 10px; display: none;">
+                    <button id="stopEraseButton" style="display: none;">
                         <img src="/diary/image/free-icon-eraser-1983927.png" width="40px">
                     </button>
                     <button id="imageBtn" style="margin-right: 10px;">사진</button>
                     <input type="file" id="file-input" multiple style="margin-right: 10px;">
                     <button id="saveButton" style="margin-right: 10px;">Save</button>
+                
                 </div>
+                
                 <button class="dropdown" style="display: flex; flex-direction: row; align-items: center;">
                     <img src="/diary/image/free-icon-color-palette-12471763.png" width="40px">
                 </button>
+                
             </div>
         </div>
         
@@ -522,6 +525,8 @@
             context.canvas.height = window.innerHeight;
             loadCanvasData();
         });
+
+        
     </script>
   
     
