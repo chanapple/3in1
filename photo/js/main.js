@@ -216,9 +216,16 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 	//history 배열에 저장.
-	canvas.on("object:added", saveHistory);
-	canvas.on("object:modified", saveHistory);
-	canvas.on("object:removed", saveHistory);
+	canvas.on("object:added", handleObjectEvent);
+	canvas.on("object:modified", handleObjectEvent);
+	canvas.on("object:removed", handleObjectEvent);
+
+	function handleObjectEvent(e) {
+		if (e.target) {
+			canvas.setActiveObject(e.target);
+		}
+		saveHistory(e);
+	}
 
 	//"Ctrl+Z"에 대한 이벤트 리스너
 	window.addEventListener("keydown", keysPressed, false);
@@ -239,5 +246,44 @@ document.addEventListener("DOMContentLoaded", function () {
 			document.getElementById("brush_size").value,
 			10
 		);
+	});
+
+	// Socket.IO 클라이언트 생성(객체를 통해 서버와 통신가능.)
+	const socket = io();
+
+	// 소켓 연결되면
+	socket.on("connect", () => {
+		console.log("Connected to the server");
+	});
+
+	// 유저가 그린 그림 객체 받아오기. 서버에서 draw 이벤트가 발생하면 실행되는 콜백함수.
+	socket.on("draw", data => {
+		console.log("Draw event received:", data);
+		//"fabric.util.enlivenObjects"은 JSON 데이터를 Fabric.js 객체로 변환하는 함수.
+		//[data]는 서버에서 전송된 데이터를 배열로 감싼 것
+		fabric.util.enlivenObjects([data], objects => {
+			objects.forEach(obj => {
+				canvas.add(obj); // 그림판에 그림을 추가함.
+				console.log("Object added to canvas:", obj);
+				// console.log(obj + "그림판에 그림 추가함.");
+			});
+		});
+		// console.log("main.js draw 콜백함수 실행됨.");
+	});
+
+	// 유저가 그림을 그릴 때
+	canvas.on("mouse:up", () => {
+		// console.log("마우스 업 입력됨.");
+		// 지금 그린 그림 객체 가져오기
+		const activeObject = canvas.getActiveObject();
+		// console.log(activeObject);
+		if (activeObject) {
+			// 그 그림 객체를 JSON 데이터로 변환함.
+			const objectData = activeObject.toObject();
+			// 서버에 그림 객체 데이터를 전송함. 서버에게 보낸 데이터로 draw 이벤트 함수 실행시키라함.
+			socket.emit("draw", objectData);
+			// console.log(objectData);
+			// console.log("index.js에 있는 draw에 " + objectData + " 보냄");
+		}
 	});
 });
